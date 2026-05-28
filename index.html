@@ -29,33 +29,19 @@
 }
 
 #book {
-  height: 100vh; height: 100dvh;
-  min-height: -webkit-fill-available;
-  overflow-y: scroll;
-  scroll-snap-type: none;
-  -webkit-overflow-scrolling: touch;
-  overscroll-behavior-y: contain;
-  scrollbar-width: none;
-  -ms-overflow-style: none;
+  /* Scroll libre — el documento completo scrollea, no un contenedor bloqueado */
 }
-#book::-webkit-scrollbar { display: none; }
-html { height: 100%; }
+html { scroll-behavior: smooth; }
 body {
   font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, sans-serif;
   -webkit-font-smoothing: antialiased;
   background: var(--dark);
   font-size: 16px; line-height: 1.6;
-  height: 100%;
-  min-height: -webkit-fill-available;
 }
 
 /* ─── Sections ─── */
 .s {
-  /* min-height: secciones cortas = 1 pantalla exacta.
-     Secciones con mucho texto crecen naturalmente → nunca cortan contenido. */
   min-height: 100vh; min-height: 100dvh;
-  scroll-snap-align: start;
-  scroll-snap-stop: always;
   position: relative;
   overflow: visible;
 }
@@ -1090,7 +1076,6 @@ function updateVisibility() {
 
 // Escuchar en book Y en window — QuickLook a veces scrollea el window,
 // no el overflow container. Cubrimos ambos casos.
-book.addEventListener('scroll',   updateVisibility, { passive: true });
 window.addEventListener('scroll', updateVisibility, { passive: true });
 
 // Correr en load, tras fonts, y fallback agresivo a 1.5s
