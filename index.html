@@ -1,0 +1,1421 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<title>Deja de Regalar Tu Trabajo — Read &amp; Play Studio</title>
+<style>
+/* ════════════════════════════════════════════════════════
+   DEJA DE REGALAR TU TRABAJO
+   Read & Play Studio · Edición Extendida · 002 · 2026
+   ════════════════════════════════════════════════════════ */
+
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+:root {
+  --dark:    #1c1814;
+  --dark-2:  #2a2520;
+  --cream:   #f7f4ee;
+  --sand:    #ede9df;
+  --text:    #1a1916;
+  --text-2:  #635f59;
+  --text-3:  #a09a92;
+  --accent:  #c95200;
+  --acc-l:   #fdeee5;
+  --acc-d:   #a34200;
+  --border:  #ddd9cf;
+  --white:   #ffffff;
+  --green:   #15803d;
+}
+
+#book {
+  height: 100vh; height: 100dvh;
+  min-height: -webkit-fill-available;
+  overflow-y: scroll;
+  /* Snap CSS desactivado — el snapHelper JS controla la navegación entre secciones.
+     Así el scroll interno de herramientas (calculadora, checklist) no compite. */
+  scroll-snap-type: none;
+  -webkit-overflow-scrolling: touch;
+  overscroll-behavior-y: contain;
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+}
+#book::-webkit-scrollbar { display: none; }
+html { height: 100%; }
+body {
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, sans-serif;
+  -webkit-font-smoothing: antialiased;
+  background: var(--dark);
+  font-size: 16px; line-height: 1.6;
+  height: 100%;
+  min-height: -webkit-fill-available;
+}
+
+/* ─── Sections ─── */
+.s {
+  /* min-height: secciones cortas = 1 pantalla exacta.
+     Secciones con mucho texto crecen naturalmente → nunca cortan contenido. */
+  min-height: 100vh; min-height: 100dvh;
+  scroll-snap-align: start;
+  scroll-snap-stop: always;
+  position: relative;
+  overflow: visible;
+}
+/* La portada siempre ocupa exactamente una pantalla */
+#s1 { height: 100vh; height: 100dvh; overflow: hidden; }
+.s--dark  { background: var(--dark);  color: var(--white); }
+.s--cream { background: var(--cream); color: var(--text);  }
+.s--sand  { background: var(--sand);  color: var(--text);  }
+
+/* ─── Content container ─── */
+.s-body {
+  padding: calc(38px + env(safe-area-inset-top, 0px))
+           calc(28px + env(safe-area-inset-right, 0px))
+           calc(48px + env(safe-area-inset-bottom, 0px))
+           calc(28px + env(safe-area-inset-left, 0px));
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start;
+}
+/* Cover: centre vertically (height:100% needed for flex centering) */
+#s1 .s-body { height: 100%; justify-content: center; padding-bottom: calc(52px + env(safe-area-inset-bottom, 0px)); }
+#s16 .s-body { padding-top: calc(44px + env(safe-area-inset-top, 0px)); }
+
+/* ─── Fixed chrome ─── */
+.top-bar {
+  position: fixed; top: 0; left: 0; right: 0;
+  height: 2px; background: rgba(255,255,255,0.07);
+  z-index: 100; pointer-events: none;
+}
+.top-fill { height: 100%; background: var(--accent); transition: width 0.4s; width: 6.25%; }
+#ctr {
+  position: fixed; bottom: calc(18px + env(safe-area-inset-bottom, 0px)); right: calc(20px + env(safe-area-inset-right, 0px));
+  font-size: 10px; font-weight: 800; letter-spacing: 0.14em;
+  z-index: 100; pointer-events: none; transition: color 0.3s;
+}
+.cl { color: rgba(255,255,255,0.22); }
+.cd { color: rgba(0,0,0,0.18); }
+
+/* ─── Hook at screen bottom ─── */
+/* Default: absolute for sections where JS hasn't run */
+.hook {
+  position: absolute; bottom: 50px; left: 28px; right: 28px;
+  font-size: 13px; font-style: italic; font-weight: 500;
+  color: var(--accent); line-height: 1.5;
+  padding-top: 13px; border-top: 1px solid rgba(201,82,0,0.2);
+}
+.s--dark .hook {
+  color: rgba(255,255,255,0.42);
+  border-top-color: rgba(255,255,255,0.1);
+}
+/* When JS moves .hook inside .s-body, it becomes a flex child at end of content */
+.s-body > .hook {
+  position: relative !important;
+  bottom: auto !important; left: auto !important; right: auto !important;
+  margin-top: 28px;
+  padding-bottom: 16px;
+  flex-shrink: 0;
+}
+
+/* ─── Scroll hint ─── */
+.hint {
+  position: absolute; bottom: 20px; right: 28px;
+  opacity: 0.25; animation: bob 2.8s ease-in-out infinite;
+}
+@keyframes bob { 0%,100%{transform:translateY(0)} 50%{transform:translateY(5px)} }
+
+/* ─── Divider ─── */
+.rule { width: 32px; height: 2px; background: var(--accent); margin: 20px 0; }
+.rule--light { background: rgba(255,255,255,0.2); }
+
+/* ─── Base type ─── */
+.eyebrow {
+  font-size: 10px; font-weight: 800; letter-spacing: 0.2em;
+  text-transform: uppercase; margin-bottom: 10px; opacity: 0.38;
+}
+.h1 {
+  font-size: clamp(27px, 7vw, 44px);
+  font-weight: 900; line-height: 1.05; letter-spacing: -0.03em; margin-bottom: 14px;
+}
+.h2 {
+  font-size: clamp(17px, 4.5vw, 24px);
+  font-weight: 800; line-height: 1.2; letter-spacing: -0.02em; margin-bottom: 10px;
+}
+.body {
+  font-size: 14.5px; line-height: 1.8; color: var(--text-2); max-width: 580px;
+}
+.body p { margin-bottom: 14px; }
+.body p:last-child { margin-bottom: 0; }
+.body strong { color: var(--text); font-weight: 700; }
+.body em { font-style: italic; opacity: 0.8; }
+.body--light { color: rgba(255,255,255,0.78); }
+.body--light strong { color: white; }
+.body--light em { opacity: 0.6; }
+/* Dark sections — slightly higher contrast text for readability */
+.s--dark .body:not(.body--light) { color: rgba(255,255,255,0.72); }
+.s--dark .body:not(.body--light) strong { color: rgba(255,255,255,0.92); }
+.mt { margin-top: 16px; }
+
+/* ─── Citation card ─── */
+.cite {
+  background: var(--white); border-radius: 10px; padding: 14px 16px;
+  border-left: 3px solid var(--accent); margin: 18px 0;
+  font-size: 13px; line-height: 1.65;
+}
+.cite-title { font-weight: 700; color: var(--text); margin-bottom: 4px; font-size: 13px; }
+.cite-body  { color: var(--text-2); }
+.cite-ref   { font-size: 11px; color: var(--text-3); margin-top: 7px; font-style: italic; }
+.s--sand .cite { background: var(--cream); }
+
+/* ─── Recognition checks ─── */
+.checks { display: flex; flex-direction: column; gap: 11px; margin: 18px 0; }
+.chk {
+  display: flex; gap: 12px; align-items: flex-start;
+  font-size: 14px; line-height: 1.5; color: var(--text-2);
+}
+.chk .dot {
+  width: 20px; height: 20px; border-radius: 50%;
+  background: var(--acc-l); color: var(--accent);
+  font-size: 10px; font-weight: 900; flex-shrink: 0;
+  display: flex; align-items: center; justify-content: center; margin-top: 1px;
+}
+.chk strong { color: var(--text); font-weight: 700; }
+
+/* ─── Story pivot quote ─── */
+.pivot {
+  border-left: 3px solid var(--accent);
+  padding: 14px 16px; margin: 18px 0;
+  background: var(--cream); border-radius: 0 10px 10px 0;
+  font-size: 14px; line-height: 1.75; color: var(--text);
+}
+.s--sand .pivot { background: var(--sand); border-color: var(--acc-d); }
+.pivot strong { font-weight: 800; color: var(--acc-d); }
+
+/* ─── Highlight box ─── */
+.hbox {
+  background: var(--dark); color: var(--white);
+  border-radius: 12px; padding: 18px 16px; margin-top: 18px;
+}
+.hbox .h2 { color: white; font-size: clamp(16px,4.5vw,22px); }
+.hbox p { font-size: 13.5px; line-height: 1.7; color: rgba(255,255,255,0.62); margin-top: 8px; }
+.hbox strong { color: var(--accent); }
+
+/* ─── Stat callout ─── */
+.stat-row { display: flex; gap: 12px; margin: 18px 0; flex-wrap: wrap; }
+.stat {
+  background: var(--white); border-radius: 10px; padding: 14px 16px;
+  flex: 1; min-width: 130px; border: 1px solid var(--border);
+}
+.s--sand .stat { background: var(--cream); }
+.stat-num { font-size: 26px; font-weight: 900; color: var(--accent); letter-spacing: -0.03em; }
+.stat-lbl { font-size: 11.5px; color: var(--text-2); line-height: 1.4; margin-top: 3px; }
+
+/* ─── Scenario cards ─── */
+.sc-list { display: flex; flex-direction: column; gap: 9px; margin: 16px 0; }
+.sc {
+  background: var(--white); border-radius: 10px; padding: 13px 15px;
+  border-left: 3px solid var(--border); font-size: 13.5px; color: var(--text-2); line-height: 1.55;
+}
+.sc.hot { border-left-color: var(--accent); }
+.sc-lbl {
+  display: block; font-size: 9.5px; font-weight: 800;
+  text-transform: uppercase; letter-spacing: 0.12em; color: var(--text-3); margin-bottom: 5px;
+}
+
+/* ─── Layer cards ─── */
+.layers { display: flex; flex-direction: column; gap: 12px; margin-top: 16px; }
+.layer {
+  background: var(--white); border-radius: 11px; border: 1px solid var(--border);
+  padding: 15px 14px; display: flex; gap: 12px; align-items: flex-start;
+}
+.s--sand .layer { background: var(--cream); }
+.ln {
+  font-size: 10px; font-weight: 900; letter-spacing: 0.1em;
+  color: var(--accent); background: var(--acc-l);
+  border-radius: 5px; padding: 3px 7px; flex-shrink: 0; margin-top: 2px;
+}
+.lt { font-size: 13.5px; font-weight: 800; color: var(--text); margin-bottom: 4px; }
+.lb { font-size: 12.5px; color: var(--text-2); line-height: 1.65; }
+.lb strong { color: var(--text); font-weight: 700; }
+
+/* ─── Script cards ─── */
+.scripts { display: flex; flex-direction: column; gap: 12px; margin-top: 16px; }
+.sc-card {
+  background: var(--white); border-radius: 11px; border: 1px solid var(--border); overflow: hidden;
+}
+.sc-head {
+  padding: 9px 14px; background: #efebe2;
+  font-size: 10px; font-weight: 800; text-transform: uppercase; letter-spacing: 0.1em; color: var(--text-2);
+}
+.sc-body {
+  padding: 13px 14px; border-bottom: 1px solid var(--border);
+  font-family: 'Courier New', monospace;
+  font-size: 12.5px; line-height: 1.75; color: var(--text);
+}
+.copy-btn {
+  width: 100%; padding: 9px 14px; background: none; border: none; cursor: pointer;
+  display: flex; align-items: center; gap: 7px;
+  font-size: 11px; font-weight: 800; text-transform: uppercase; letter-spacing: 0.1em;
+  color: var(--accent); transition: background 0.15s; font-family: inherit;
+}
+.copy-btn:hover { background: var(--acc-l); }
+.copy-btn.ok { color: var(--green); }
+
+/* ─── Calculator ─── */
+.calc-card {
+  background: var(--white); border-radius: 14px; border: 1px solid var(--border);
+  padding: 20px 18px; margin-top: 16px;
+}
+.fields { display: flex; flex-direction: column; gap: 13px; margin-bottom: 16px; }
+.field label {
+  display: block; font-size: 10px; font-weight: 800;
+  text-transform: uppercase; letter-spacing: 0.12em; color: var(--text-3); margin-bottom: 6px;
+}
+.field input {
+  width: 100%; padding: 10px 13px;
+  border: 1.5px solid var(--border); border-radius: 8px;
+  font-size: 20px; font-weight: 800; color: var(--text);
+  background: var(--cream); outline: none; font-family: inherit; transition: border-color 0.15s;
+}
+.field input:focus { border-color: var(--accent); }
+.field-row { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+.presets { display: flex; gap: 6px; flex-wrap: wrap; }
+.pbtn {
+  padding: 4px 10px; border-radius: 99px; border: 1.5px solid var(--border);
+  background: var(--cream); font-size: 10.5px; font-weight: 700; cursor: pointer;
+  color: var(--text-2); transition: all 0.15s; font-family: inherit;
+}
+.pbtn:hover, .pbtn.on { border-color: var(--accent); color: var(--accent); background: var(--acc-l); }
+.adv-toggle {
+  width: 100%; padding: 10px 14px; margin-bottom: 14px;
+  background: none; border: 1.5px dashed var(--border); border-radius: 9px;
+  font-size: 11.5px; font-weight: 700; color: var(--text-3); cursor: pointer;
+  display: flex; align-items: center; justify-content: center; gap: 7px;
+  transition: all 0.2s; font-family: inherit;
+}
+.adv-toggle:hover, .adv-toggle.open { border-color: var(--accent); color: var(--accent); background: var(--acc-l); }
+.adv-body { display: none; }
+.adv-body.open { display: block; }
+.adv-ttl {
+  font-size: 10px; font-weight: 800; text-transform: uppercase;
+  letter-spacing: 0.14em; color: var(--text-3);
+  margin-bottom: 10px; padding-bottom: 8px; border-bottom: 1px solid var(--border);
+}
+.sep { height: 1px; background: var(--border); margin: 14px 0; }
+.outputs { display: flex; flex-direction: column; gap: 8px; }
+.out {
+  display: flex; justify-content: space-between; align-items: center;
+  padding: 10px 13px; border-radius: 8px; background: var(--cream);
+}
+.out.main   { background: var(--accent); color: white; }
+.out.anchor { background: var(--dark);   color: white; }
+.out.sub    { background: #f1ede3; }
+.out-lbl { font-size: 11.5px; font-weight: 600; opacity: 0.7; }
+.out.main .out-lbl, .out.anchor .out-lbl { color: inherit; }
+.out-val { font-size: 20px; font-weight: 900; letter-spacing: -0.02em; }
+.out-val.sm { font-size: 15px; }
+.calc-note { font-size: 11.5px; color: var(--text-3); margin-top: 10px; line-height: 1.65; }
+
+/* ─── Checklist ─── */
+.cl-wrap { display: flex; flex-direction: column; margin-top: 16px; }
+.ci {
+  display: flex; align-items: flex-start; gap: 12px;
+  padding: 10px 2px; border-bottom: 1px solid var(--border);
+  cursor: pointer; -webkit-tap-highlight-color: transparent; user-select: none;
+}
+.ci:last-of-type { border-bottom: none; }
+.cb {
+  width: 18px; height: 18px; border-radius: 5px;
+  border: 2px solid var(--border); flex-shrink: 0;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 9px; color: transparent; background: white; transition: all 0.15s; margin-top: 2px;
+}
+.ci.on .cb { background: var(--accent); border-color: var(--accent); color: white; }
+.ct { font-size: 13px; color: var(--text); line-height: 1.4; transition: color 0.15s; }
+.ci.on .ct { color: var(--text-3); text-decoration: line-through; }
+.cl-prog {
+  display: flex; align-items: center; gap: 10px;
+  margin-top: 12px; padding-top: 10px; border-top: 1px solid var(--border);
+}
+.cl-track { flex: 1; height: 5px; background: var(--border); border-radius: 99px; overflow: hidden; }
+.cl-fill  { height: 100%; background: var(--accent); border-radius: 99px; transition: width 0.3s; }
+.cl-pct   { font-size: 11px; font-weight: 800; color: var(--accent); min-width: 32px; text-align: right; }
+
+/* ─── Bibliography ─── */
+.bib-list { display: flex; flex-direction: column; gap: 0; margin-top: 16px; }
+.bib-item {
+  padding: 13px 0; border-bottom: 1px solid var(--border);
+  font-size: 12.5px; line-height: 1.65; color: var(--text-2);
+}
+.bib-item:last-child { border-bottom: none; }
+.bib-item strong { color: var(--text); font-weight: 700; display: block; margin-bottom: 2px; }
+.bib-item em { font-style: italic; }
+.bib-section {
+  font-size: 10px; font-weight: 800; text-transform: uppercase; letter-spacing: 0.14em;
+  color: var(--text-3); margin-top: 18px; margin-bottom: 4px; padding-bottom: 6px;
+  border-bottom: 1px solid var(--border);
+}
+
+/* ─── Manifesto ─── */
+.mani {
+  font-size: clamp(15px, 4vw, 19px); font-weight: 400; line-height: 1.85; opacity: 0.88; max-width: 520px;
+}
+.mani strong { font-weight: 800; color: var(--accent); }
+.mani em { font-style: italic; opacity: 0.6; }
+.mf {
+  margin-top: 28px; padding-top: 20px; border-top: 1px solid rgba(255,255,255,0.08);
+  display: flex; justify-content: space-between; align-items: flex-end;
+}
+.mf-brand { font-size: 10px; font-weight: 800; letter-spacing: 0.18em; text-transform: uppercase; opacity: 0.28; }
+.mf-num   { font-size: 10px; opacity: 0.18; letter-spacing: 0.1em; }
+
+/* ══════════════════════════════════════════
+   MOTION EDITORIAL + FEEDBACK TÁCTIL
+   ══════════════════════════════════════════ */
+
+/* ─── Google Fonts (progressive enhancement) ─── */
+@import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:ital,wght@0,400;0,600;0,700;0,800;0,900;1,400&family=Inter:wght@400;500;600;700;800;900&display=swap');
+body    { font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, sans-serif; }
+.h1, .h2 { font-family: 'Plus Jakarta Sans', -apple-system, sans-serif; }
+
+/* ─── Font size system (2 modos) ─── */
+:root { --ts: 1; }
+.body  { font-size: calc(14.5px * var(--ts)); }
+.large-text { --ts: 1.18; }
+
+/* ─── Font toggle button ─── */
+#font-btn {
+  position: fixed; top: max(58px, calc(10px + env(safe-area-inset-top, 0px))); left: calc(14px + env(safe-area-inset-left, 0px)); z-index: 9000;
+  font-size: 11px; font-weight: 800; letter-spacing: 0.08em;
+  min-width: 44px; min-height: 32px;
+  padding: 6px 13px; border-radius: 99px; border: 1px solid rgba(255,255,255,0.15);
+  cursor: pointer; font-family: inherit; line-height: 1;
+  background: rgba(28, 24, 20, 0.9); color: rgba(255,255,255,0.55);
+  -webkit-tap-highlight-color: transparent;
+  touch-action: manipulation;
+  transition: background 0.2s, color 0.2s, border-color 0.2s;
+}
+#font-btn:active { transform: scale(0.95); }
+#font-btn.large  { color: var(--accent); border-color: rgba(201,82,0,0.5); background: rgba(28,24,20,0.95); }
+
+/* ─── Staggered entry animations ─── */
+.anim {
+  opacity: 0; transform: translateY(18px);
+  transition: opacity 0.52s ease, transform 0.52s ease;
+  will-change: opacity, transform;
+}
+.anim.d1 { transition-delay: 0.04s; }
+.anim.d2 { transition-delay: 0.16s; }
+.anim.d3 { transition-delay: 0.27s; }
+.anim.d4 { transition-delay: 0.37s; }
+.anim.d5 { transition-delay: 0.46s; }
+.s.visible .anim { opacity: 1; transform: translateY(0); }
+
+/* ─── Micro-interactions: botones ─── */
+.copy-btn { transition: background 0.15s, transform 0.1s; touch-action: manipulation; }
+.copy-btn:active { transform: scale(0.94); }
+.ci { touch-action: manipulation; transition: opacity 0.15s; }
+.ci:active { opacity: 0.7; }
+@keyframes pop-cb { 0%{transform:scale(1)} 45%{transform:scale(1.25)} 100%{transform:scale(1)} }
+.cb.pop { animation: pop-cb 0.26s ease; }
+
+/* ─── Checklist 100% ─── */
+@keyframes flash-fill { 0%,100%{opacity:1} 50%{opacity:0.2} }
+.cl-fill.done  { background: var(--green); animation: flash-fill 0.38s ease 3; }
+.cl-pct.done   { color: var(--green); }
+
+/* ─── Shareable ticket ─── */
+#ticket {
+  margin-top: 22px; padding: 16px 16px; border-radius: 14px;
+  border: 1px solid rgba(255,255,255,0.12);
+  background: linear-gradient(135deg, rgba(201,82,0,0.14), rgba(255,255,255,0.03));
+}
+.tkt-label { font-size: 9px; font-weight: 800; letter-spacing: 0.2em; text-transform: uppercase; color: var(--accent); margin-bottom: 13px; }
+.tkt-grid  { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+.tkt-k     { font-size: 9px; font-weight: 700; letter-spacing: 0.1em; text-transform: uppercase; color: rgba(255,255,255,0.3); margin-bottom: 2px; }
+.tkt-v     { font-size: 21px; font-weight: 900; letter-spacing: -0.02em; color: white; line-height: 1.1; }
+.tkt-v.acc { color: var(--accent); }
+.tkt-foot  { margin-top: 13px; padding-top: 11px; border-top: 1px solid rgba(255,255,255,0.07); font-size: 9px; font-weight: 700; letter-spacing: 0.14em; text-transform: uppercase; color: rgba(255,255,255,0.18); display: flex; justify-content: space-between; }
+
+/* ─── License Gate ─── */
+#gate {
+  position: fixed; inset: 0; z-index: 9999;
+  background: var(--dark);
+  display: flex; flex-direction: column;
+  align-items: center; justify-content: center;
+  padding: calc(40px + env(safe-area-inset-top,0px)) 28px
+           calc(40px + env(safe-area-inset-bottom,0px)) 28px;
+  transition: opacity 0.45s ease;
+}
+#gate.g-hide { opacity: 0; pointer-events: none; }
+#gate.g-gone { display: none; }
+.gate-brand {
+  font-size: 10px; font-weight: 700; letter-spacing: .2em;
+  text-transform: uppercase; color: rgba(255,255,255,0.28);
+  margin-bottom: 44px; text-align: center;
+}
+.gate-logo {
+  font-size: 28px; font-weight: 900; color: var(--cream);
+  line-height: 1.1; text-align: center; margin-bottom: 8px;
+  letter-spacing: -.02em;
+}
+.gate-sub {
+  font-size: 14px; color: rgba(255,255,255,0.42);
+  text-align: center; line-height: 1.55; margin-bottom: 36px;
+  max-width: 280px;
+}
+#gate-key {
+  display: block; width: 100%; max-width: 320px;
+  padding: 15px 16px; margin-bottom: 10px;
+  background: rgba(255,255,255,0.06);
+  border: 1px solid rgba(255,255,255,0.12);
+  border-radius: 10px;
+  color: var(--cream); font-size: 15px; letter-spacing: .06em;
+  outline: none; font-family: inherit;
+  text-transform: uppercase;
+  -webkit-appearance: none;
+}
+#gate-key::placeholder { color: rgba(255,255,255,0.18); text-transform: none; letter-spacing: 0; }
+#gate-key:focus { border-color: rgba(201,82,0,0.55); background: rgba(255,255,255,0.09); }
+#gate-btn {
+  display: block; width: 100%; max-width: 320px;
+  padding: 15px 16px;
+  background: var(--accent); color: var(--white);
+  font-size: 14px; font-weight: 700; letter-spacing: .08em;
+  text-transform: uppercase; font-family: inherit;
+  border: none; border-radius: 10px; cursor: pointer;
+  transition: background 0.2s, opacity 0.2s;
+  -webkit-appearance: none;
+}
+#gate-btn:active { background: var(--acc-d); }
+#gate-btn:disabled { opacity: 0.45; cursor: default; }
+#gate-err {
+  margin-top: 11px; font-size: 13px; color: #f87171;
+  text-align: center; min-height: 18px; max-width: 320px; width: 100%;
+}
+.gate-buy {
+  margin-top: 32px; font-size: 12px; color: rgba(255,255,255,0.22);
+  text-align: center;
+}
+.gate-buy a { color: rgba(201,82,0,0.7); text-decoration: none; }
+</style>
+</head>
+<body>
+
+<!-- ══ LICENSE GATE ══ -->
+<div id="gate">
+  <div class="gate-brand">Read &amp; Play Studio · 002 · 2026</div>
+  <div class="gate-logo">Deja de Regalar<br>Tu Trabajo</div>
+  <div class="gate-sub">Ingresa la clave de licencia que recibiste en el email de confirmación de tu compra.</div>
+  <input id="gate-key" type="text" placeholder="Ej: ABCD-1234-EFGH-5678"
+    autocapitalize="characters" autocomplete="off" spellcheck="false" maxlength="40"
+    inputmode="text">
+  <button id="gate-btn" onclick="verifyLicense()">Acceder →</button>
+  <div id="gate-err"></div>
+  <div class="gate-buy">¿Aún no lo tienes? <a href="https://gumroad.com/l/PRODUCT_PERMALINK" target="_blank">Cómpralo aquí →</a></div>
+</div>
+
+<button id="font-btn" onclick="toggleFont()" title="Cambiar tamaño de texto">Aa</button>
+<div class="top-bar"><div class="top-fill" id="prog"></div></div>
+<div id="ctr" class="cl">1 / 16</div>
+
+<div id="book">
+
+<!-- ══ 01 · COVER ══ -->
+<section class="s s--dark" id="s1">
+  <div class="s-body">
+  <div style="font-size:10px;font-weight:700;letter-spacing:.2em;text-transform:uppercase;opacity:.28;margin-bottom:28px">Read &amp; Play Studio · Edición Extendida · 002 · 2026</div>
+  <div style="font-size:clamp(46px,12vw,80px);font-weight:900;line-height:.88;letter-spacing:-.04em;margin-bottom:16px">DEJA DE<br>REGALAR<br>TU TRABAJO</div>
+  <div style="font-size:12px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;opacity:.38;margin-bottom:30px">La guía que te enseña a cobrar lo que realmente vale lo que haces</div>
+  <div class="rule"></div>
+  <div style="font-size:clamp(15px,4vw,19px);font-weight:500;line-height:1.5;opacity:.88;max-width:380px">
+    "Cada vez que cedes en tu tarifa,<br>no estás siendo <em style="color:var(--accent);font-style:normal;font-weight:700">humilde</em>.<br>Estás regalando tu trabajo."
+  </div>  </div>
+  <div class="hint" style="color:rgba(255,255,255,.3)">
+    <svg width="14" height="18" viewBox="0 0 14 18" fill="none"><path d="M7 2v14M2 11l5 5 5-5" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
+  </div>
+</section>
+
+<!-- ══ 02 · PARA QUIÉN p1 ══ -->
+<section class="s s--cream" id="s2">
+  <div class="s-body">
+  <div class="eyebrow">01 · Para Quién</div>
+  <div class="h1">¿Te reconocés<br>en esto?</div>
+  <div class="checks">
+    <div class="chk">
+      <div class="dot">✓</div>
+      <span>Eres diseñador, estratega, redactor o cualquier creativo que vende su conocimiento como servicio.</span>
+    </div>
+    <div class="chk">
+      <div class="dot">✓</div>
+      <span>Sabés que sos bueno en lo que hacés. Pero cada vez que decís tu número, algo dentro tuyo pide disculpas por molestarlo.</span>
+    </div>
+    <div class="chk">
+      <div class="dot">✓</div>
+      <span>Aceptaste proyectos por debajo de tu tarifa <strong>"solo por esta vez"</strong> — y eso se convirtió en costumbre.</span>
+    </div>
+    <div class="chk">
+      <div class="dot">✓</div>
+      <span>Ves a otros creativos cobrar el doble y no entendés por qué. (Spoiler: no es porque sean mejores que vos.)</span>
+    </div>
+  </div>
+  <div class="body mt">
+    <p>Este libro existe porque nadie más lo escribió. En la academia te enseñaron a diseñar, redactar, estrategizar. <strong>Nadie te enseñó a defender el valor de todo eso.</strong> Esa omisión tiene un precio — y lo estás pagando cada vez que cedés.</p>
+  </div>  </div>
+  <div class="hook">→ No es una falla de carácter. Hay una explicación — y una salida.</div>
+  <div class="hint" style="color:rgba(0,0,0,.18)"><svg width="14" height="18" viewBox="0 0 14 18" fill="none"><path d="M7 2v14M2 11l5 5 5-5" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+</section>
+
+<!-- ══ 03 · PARA QUIÉN p2 ══ -->
+<section class="s s--sand" id="s3">
+  <div class="s-body">
+  <div class="eyebrow">01 · Para Quién</div>
+  <div class="h1">El trabajo que<br>nadie eligió bien</div>
+  <div class="body">
+    <p>El freelancing tiene un problema de narrativa. Se vendió como el "plan B": lo que hacés mientras conseguís trabajo de verdad, lo que elegís cuando no encontrás empleo, el refugio temporal de los que no encajan en una empresa.</p>
+    <p><strong>Esa narrativa es mentira.</strong> Y es costosa. Porque si vos mismo creés que el freelancing es un plan B, vas a cobrar como plan B.</p>
+  </div>
+  <div class="stat-row">
+    <div class="stat">
+      <div class="stat-num">5×</div>
+      <div class="stat-lbl">Un proyecto bien cobrado puede valer lo que un empleado gana en un trimestre.</div>
+    </div>
+    <div class="stat">
+      <div class="stat-num">73%</div>
+      <div class="stat-lbl">de los freelancers creativos cobran por debajo de su valor de mercado real.*</div>
+    </div>
+  </div>
+  <div class="body mt">
+    <p>El freelancing <em>bien ejecutado</em> paga extraordinariamente bien. Cinco proyectos anuales correctamente cotizados pueden superar lo que la mayoría de los empleados gana en doce meses. No es teoría. Es matemática. Y ese número está en este libro.</p>
+    <p style="font-size:11.5px;color:var(--text-3)">* Fuente: Freelancers Union &amp; Upwork, "Freelancing in America" survey, 2022.</p>
+  </div>  </div>
+  <div class="hook">→ Pero antes del sistema, una confesión. Me costó cinco años hacerla.</div>
+  <div class="hint" style="color:rgba(0,0,0,.16)"><svg width="14" height="18" viewBox="0 0 14 18" fill="none"><path d="M7 2v14M2 11l5 5 5-5" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+</section>
+
+<!-- ══ 04 · LA HISTORIA p1 ══ -->
+<section class="s s--cream" id="s4">
+  <div class="s-body">
+  <div class="eyebrow">02 · La Historia</div>
+  <div class="h1">Cinco años<br>cediendo</div>
+  <div class="body">
+    <p>Durante cinco años acepté trabajar por debajo de mi precio. No porque no supiera lo que hacía — lo sabía bien. Sino porque en mi cabeza, la alternativa era no trabajar en absoluto.</p>
+    <p>Cada vez que un cliente decía "está muy caro", algo dentro mío se encogía. Lo vivía como un veredicto sobre mi valía, no como una negociación sobre el precio. Y cedía. Siempre cedía.</p>
+    <p>"Podemos hacer algo más simple por menos." Pero al final entregaba el proyecto completo. <strong>Con tal de cerrar. Con tal de sentirme útil. Con tal de que alguien, además de mí, creyera que lo que hacía valía algo.</strong></p>
+  </div>
+  <div class="pivot">
+    Eso es lo que nadie te cuenta sobre ser freelance creativo: la crisis no es de talento. <strong>Nunca fue de talento.</strong> En la academia te forman para ser excelente haciendo — pero no te enseñan a cobrar por ello. Esa omisión genera años de trabajo regalado.
+  </div>
+  <div class="body">
+    <p>Lo más duro de reconocer: no cedía por los clientes. Cedía porque <em>necesitaba su validación</em> más de lo que necesitaba su dinero.</p>
+  </div>  </div>
+  <div class="hook">→ Hasta que un día tomé la decisión más ridícula de mi vida profesional.</div>
+  <div class="hint" style="color:rgba(0,0,0,.18)"><svg width="14" height="18" viewBox="0 0 14 18" fill="none"><path d="M7 2v14M2 11l5 5 5-5" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+</section>
+
+<!-- ══ 05 · LA HISTORIA p2 ══ -->
+<section class="s s--sand" id="s5">
+  <div class="s-body">
+  <div class="eyebrow">02 · La Historia</div>
+  <div class="h1">El número que<br>cambió todo</div>
+  <div class="body">
+    <p>Cotizé 500% por encima de mi tarifa real. Me temblaba la voz. Lo rechazaron — era esperable. Pero en ese rechazo descubrí algo que no esperaba:</p>
+  </div>
+  <div class="pivot">
+    Podía bajar al 300% de más. Y <strong>esa segunda oferta se cerró</strong>. Con una seguridad que no había sentido antes en ninguna conversación de precio. Porque ya no estaba pidiendo permiso — estaba negociando desde arriba.
+  </div>
+  <div class="body">
+    <p>Entendí que <em>si no vale para mí, menos para otros</em>. Que mi narrativa debía cambiar: no vendo diseño, vendo el nivel al que sube tu empresa cuando invertís en este proceso.</p>
+    <p>Desde ahí, todo fue sistémico. <strong>Mi lenguaje cambió. Mi vestimenta cambió. Mis propuestas cambiaron. Mi sistema de pagos cambió.</strong> Empecé a pensar: ¿cómo luce, habla, presenta y se mueve alguien que factura lo que yo quiero facturar? Y construí desde ahí.</p>
+    <p>¿Por qué funcionó tan rápido? La ciencia tiene una respuesta — y es más simple de lo que creés.</p>
+  </div>  </div>
+  <div class="hook">→ ¿Por qué la voz te tiembla exactamente en ese momento? La respuesta está en un experimento de 1974.</div>
+  <div class="hint" style="color:rgba(0,0,0,.16)"><svg width="14" height="18" viewBox="0 0 14 18" fill="none"><path d="M7 2v14M2 11l5 5 5-5" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+</section>
+
+<!-- ══ 06 · EL DOLOR p1 ══ -->
+<section class="s s--cream" id="s6">
+  <div class="s-body">
+  <div class="eyebrow">03 · El Dolor</div>
+  <div class="h1">Los momentos<br>que reconocés</div>
+  <div class="sc-list">
+    <div class="sc hot">
+      <span class="sc-lbl">El más frecuente</span>
+      "No tengo el presupuesto... pero no quiero decir que tu trabajo no lo valga. Pensaba en algo más simple, quizás no necesito algo tan complejo."
+    </div>
+    <div class="sc">
+      <span class="sc-lbl">El que más duele</span>
+      Escucha toda tu propuesta. Ve tu portfolio. Hace silencio. Y después hace una oferta un 70% por debajo de tu tarifa — como si fuera lo natural.
+    </div>
+    <div class="sc">
+      <span class="sc-lbl">El que te paraliza</span>
+      Decís el número. Silencio. Tu voz tiembla cuando añadís "...pero podemos negociarlo." Y en ese instante, cediste antes de que ellos pidieran.
+    </div>
+  </div>
+  <div class="cite">
+    <div class="cite-title">El Síndrome del Impostor en profesionales creativos</div>
+    <div class="cite-body">Las psicólogas Pauline Clance y Suzanne Imes documentaron en 1978 que los profesionales de alto desempeño —especialmente en campos creativos— tienden a atribuir su éxito a la suerte o al engaño, no a su competencia real. La paradoja: <strong>quienes más saben sobre su campo son, con frecuencia, quienes más dudan de su derecho a cobrar por ese conocimiento.</strong></div>
+    <div class="cite-ref">Clance, P.R., &amp; Imes, S.A. (1978). Psychotherapy: Theory, Research &amp; Practice, 15(3), 241–247.</div>
+  </div>  </div>
+  <div class="hook">→ Hay un mecanismo cerebral que opera antes de que el cliente abra la boca. Y lleva décadas trabajando en tu contra.</div>
+  <div class="hint" style="color:rgba(0,0,0,.18)"><svg width="14" height="18" viewBox="0 0 14 18" fill="none"><path d="M7 2v14M2 11l5 5 5-5" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+</section>
+
+<!-- ══ 07 · EL DOLOR p2 — Neurociencia ══ -->
+<section class="s s--sand" id="s7">
+  <div class="s-body">
+  <div class="eyebrow">03 · El Dolor</div>
+  <div class="h1">Lo que pasa<br>en tu cerebro</div>
+  <div class="body">
+    <p>Cuando un cliente dice "está muy caro", tu cerebro interpreta esa frase como evidencia de que tu precio <em>estaba mal desde el principio</em>. No como una táctica de negociación. No como una expectativa de mercado. Como una verdad.</p>
+    <p>Eso tiene un nombre: sesgo de confirmación aplicado al autoprecio. Y se combina con otro mecanismo aún más poderoso.</p>
+  </div>
+  <div class="cite">
+    <div class="cite-title">El efecto de anclaje — Tversky &amp; Kahneman, 1974</div>
+    <div class="cite-body">En su investigación fundacional sobre heurísticas y sesgos cognitivos, Tversky y Kahneman demostraron que <strong>el primer número que escucha una persona ancla toda su estimación posterior</strong>. Ese número inicial —incluso si es aleatorio— define el rango de lo que el cerebro considera "razonable". En una negociación de precio, quien habla primero define ese ancla.</div>
+    <div class="cite-ref">Tversky, A., &amp; Kahneman, D. (1974). Science, 185(4157), 1124–1131.</div>
+  </div>
+  <div class="cite">
+    <div class="cite-title">El precio como señal de calidad — Ariely et al., 2003</div>
+    <div class="cite-body">Dan Ariely y sus colegas del MIT demostraron que <strong>los precios moldean las preferencias</strong>, no al revés. Un servicio presentado a mayor precio no solo se percibe como mejor — en múltiples experimentos, los participantes reportaron resultados objetivamente superiores al pagar más por el mismo producto. Cobrar barato, literalmente, hace que tu trabajo parezca peor.</div>
+    <div class="cite-ref">Ariely, D., Loewenstein, G., &amp; Prelec, D. (2003). Quarterly Journal of Economics, 118(1), 73–105.</div>
+  </div>  </div>
+  <div class="hook">→ El mismo mecanismo que te perjudica puede trabajar para vos. Hay tres capas para hacerlo.</div>
+  <div class="hint" style="color:rgba(0,0,0,.16)"><svg width="14" height="18" viewBox="0 0 14 18" fill="none"><path d="M7 2v14M2 11l5 5 5-5" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+</section>
+
+<!-- ══ 08 · EL SISTEMA p1 ══ -->
+<section class="s s--cream" id="s8">
+  <div class="s-body">
+  <div class="eyebrow">04 · El Sistema</div>
+  <div class="h1">Tres capas.<br>Un sistema.</div>
+  <div class="body">
+    <p>No hay un truco de precio. Hay un sistema. Y como todo sistema, funciona cuando las tres capas operan juntas — no en aislamiento.</p>
+    <p>La mayoría de los consejos sobre precios se enfocan en la capa superficial: "sé más confiado", "no te disculpes", "practicá en el espejo". Eso es ignorar las dos capas de fondo que sostienen todo lo demás.</p>
+  </div>
+  <div class="layers">
+    <div class="layer">
+      <span class="ln">01</span>
+      <div><div class="lt">El Ancla Alta</div><div class="lb">Cotizá primero, y cotizá alto. El primer número define el campo de juego de toda la negociación.</div></div>
+    </div>
+    <div class="layer">
+      <span class="ln">02</span>
+      <div><div class="lt">El Reframe Sistémico</div><div class="lb">Cambiar la pregunta de "¿cuánto cuesta?" a "¿cuánto cuesta no tenerlo?" reencuadra toda la conversación.</div></div>
+    </div>
+    <div class="layer">
+      <span class="ln">03</span>
+      <div><div class="lt">La Casa en Orden</div><div class="lb">Factura, contrato, deck, website, lenguaje. La estructura profesional es lo que hace que la voz no tiemble — antes de abrir la boca.</div></div>
+    </div>
+  </div>
+  <div class="cite" style="margin-top:16px">
+    <div class="cite-title">Win Without Pitching — Blair Enns</div>
+    <div class="cite-body">"El mayor error del profesional creativo no es cobrar poco, sino entrar al proceso de compra del cliente en lugar de liderar su propio proceso de venta. <strong>Quien define las reglas del juego, define el precio.</strong>"</div>
+    <div class="cite-ref">Enns, B. (2010). The Win Without Pitching Manifesto. RockBench Publishing.</div>
+  </div>  </div>
+  <div class="hook">→ La primera capa parece ilógica. Tiene 50 años de evidencia experimental detrás.</div>
+  <div class="hint" style="color:rgba(0,0,0,.18)"><svg width="14" height="18" viewBox="0 0 14 18" fill="none"><path d="M7 2v14M2 11l5 5 5-5" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+</section>
+
+<!-- ══ 09 · EL SISTEMA p2 — Ancla ══ -->
+<section class="s s--sand" id="s9">
+  <div class="s-body">
+  <div class="eyebrow">04 · El Sistema</div>
+  <div class="h1">Capa 1:<br>El Ancla Alta</div>
+  <div class="body">
+    <p>Cotizá 500% por encima de tu tarifa real. La voz temblará — está bien. Pero hacé la oferta igual. Lo que ocurre después es sistemático:</p>
+  </div>
+  <div class="cite">
+    <div class="cite-title">La ventaja estructural del que hace la primera oferta</div>
+    <div class="cite-body">Galinsky y Mussweiler demostraron en 2001 que <strong>quien hace la primera oferta en una negociación tiene una ventaja estructural</strong>: ese número se convierte en el centro de gravedad de toda la conversación. No importa si es "razonable" o no — define el rango de lo posible. En sus estudios, los negociadores que abrieron con números altos cerraron acuerdos consistentemente más favorables, incluso cuando su contraparte era más experta.</div>
+    <div class="cite-ref">Galinsky, A.D., &amp; Mussweiler, T. (2001). Journal of Personality and Social Psychology, 81(4), 657–669.</div>
+  </div>
+  <div class="body">
+    <p>En términos prácticos: cuando cotizás 500% arriba, tu cerebro recalibra lo que considera "razonable". <strong>Tu segunda oferta —que en otro contexto hubiera parecido cara— ahora parece un descuento generoso.</strong></p>
+    <p>Y la voz deja de temblar. Porque ya no estás pidiendo perdón por un precio que parece excesivo — estás bajando desde una posición de poder.</p>
+  </div>
+  <div class="body mt">
+    <p style="font-size:13px;color:var(--text-3)">Nota: el ancla no reemplaza el valor real de tu trabajo — lo contextualiza. Un ancla sin substancia se derrumba. Con substancia, multiplica.</p>
+  </div>  </div>
+  <div class="hook">→ Anclar establece el campo. El reframe gana la conversación.</div>
+  <div class="hint" style="color:rgba(0,0,0,.16)"><svg width="14" height="18" viewBox="0 0 14 18" fill="none"><path d="M7 2v14M2 11l5 5 5-5" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+</section>
+
+<!-- ══ 10 · EL SISTEMA p3 — Reframe + Casa ══ -->
+<section class="s s--cream" id="s10">
+  <div class="s-body">
+  <div class="eyebrow">04 · El Sistema</div>
+  <div class="h1">Capas 2 y 3:<br>El Reframe y<br>La Casa</div>
+  <div class="h2" style="margin-top:4px">Capa 2 — El Reframe Sistémico</div>
+  <div class="body">
+    <p>Cuando dicen "está muy caro", el problema real es de perspectiva: están evaluando tu trabajo como una línea de gasto aislada. Tu trabajo es reencuadrarlo como parte de un sistema mayor.</p>
+    <p>La pregunta que cambia todo no es "¿cuánto cuesta?" sino <strong>"¿cuánto te está costando no tenerlo resuelto?"</strong> Esta pregunta desplaza la conversación del precio al valor — y coloca al cliente frente a la verdadera decisión.</p>
+  </div>
+  <div class="rule"></div>
+  <div class="h2">Capa 3 — La Casa en Orden</div>
+  <div class="body">
+    <p>Esta es la capa más ignorada — y la más poderosa. No porque tenga la mejor técnica, sino porque opera antes de que empieces a hablar.</p>
+    <p>¿Quién paga $10,000 a alguien que no tiene factura, que no tiene contrato, cuyo website no comunica nada claro? <strong>La estructura profesional es el precio antes del precio.</strong> Cuando tu casa está en orden, el cliente ya tomó la decisión antes de que digas el número.</p>
+    <p>Pensá cómo luce, habla, presenta y se mueve alguien que factura lo que querés facturar — y construí desde ahí. No es pretensión. Es consistencia.</p>
+  </div>  </div>
+  <div class="hook">→ Ahora tenés el sistema. Estas son las palabras exactas para cada situación.</div>
+  <div class="hint" style="color:rgba(0,0,0,.18)"><svg width="14" height="18" viewBox="0 0 14 18" fill="none"><path d="M7 2v14M2 11l5 5 5-5" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+</section>
+
+<!-- ══ 11 · SCRIPTS p1 ══ -->
+<section class="s s--sand" id="s11">
+  <div class="s-body">
+  <div class="eyebrow">05 · Los Scripts</div>
+  <div class="h1">Por qué estas<br>palabras funcionan</div>
+  <div class="body">
+    <p>Los scripts que vienen en la siguiente página no son improvisaciones. Cada uno está construido sobre los mismos principios psicológicos que usa la negociación de alto desempeño: reencuadre, reciprocidad y control del marco.</p>
+  </div>
+  <div class="cite">
+    <div class="cite-title">Never Split the Difference — Chris Voss</div>
+    <div class="cite-body">El ex-negociador de rehenes del FBI Chris Voss documentó en su libro que <strong>las negociaciones no se ganan con lógica sino con percepción</strong>. Los scripts más efectivos no argumentan — redirigen. En lugar de defender el precio, hacen que el cliente se pregunte por el costo de no invertir. "La pregunta correcta es más poderosa que el argumento correcto."</div>
+    <div class="cite-ref">Voss, C. (2016). Never Split the Difference. Harper Business.</div>
+  </div>
+  <div class="body">
+    <p>Los tres scripts que siguen operan en tres niveles simultáneamente:</p>
+  </div>
+  <div class="layers" style="margin-top:12px">
+    <div class="layer">
+      <span class="ln">→</span>
+      <div><div class="lt">Validan al cliente</div><div class="lb">No lo contradicen. Lo escuchan. Esto baja la resistencia antes de reencuadrar.</div></div>
+    </div>
+    <div class="layer">
+      <span class="ln">→</span>
+      <div><div class="lt">Desplazan el marco</div><div class="lb">De "¿cuánto cuesta?" a "¿cuánto cuesta no tenerlo?" — sin que el cliente note el cambio.</div></div>
+    </div>
+    <div class="layer">
+      <span class="ln">→</span>
+      <div><div class="lt">Preservan tu posición</div><div class="lb">Ninguno concede. Todos abren conversación desde una posición de valor, no de disculpa.</div></div>
+    </div>
+  </div>  </div>
+  <div class="hook">→ Copiálos. Practicálos en voz alta. Úsalos.</div>
+  <div class="hint" style="color:rgba(0,0,0,.16)"><svg width="14" height="18" viewBox="0 0 14 18" fill="none"><path d="M7 2v14M2 11l5 5 5-5" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+</section>
+
+<!-- ══ 12 · SCRIPTS p2 ══ -->
+<section class="s s--cream" id="s12">
+  <div class="s-body">
+  <div class="eyebrow">05 · Los Scripts</div>
+  <div class="h1">Las palabras<br>exactas</div>
+  <p style="font-size:13.5px;color:var(--text-2);margin-bottom:4px">Practicá cada uno en voz alta antes de tu próxima reunión. La seguridad no es innata — es ensayada.</p>
+  <div class="scripts">
+    <div class="sc-card">
+      <div class="sc-head">Cuando dicen: "No tengo el presupuesto"</div>
+      <div class="sc-body" id="t1">Un proyecto puede parecer costoso si lo evaluás de forma aislada. Pero nada en una empresa es aislado — todo se interconecta. ¿Me permitís que le demos un vistazo juntos a tu estrategia general? Quizás ajustamos el alcance para que la inversión tenga sentido ahora.</div>
+      <button class="copy-btn" onclick="cp(1,this)"><svg width="13" height="13" viewBox="0 0 13 13" fill="none"><rect x="4" y="4" width="8" height="8" rx="1.5" stroke="currentColor" stroke-width="1.4"/><path d="M1 9V2.5A1.5 1.5 0 012.5 1H9" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/></svg> Copiar script</button>
+    </div>
+    <div class="sc-card">
+      <div class="sc-head">Cuando dicen: "Está muy caro"</div>
+      <div class="sc-body" id="t2">Mi pregunta es: ¿cuánto te está costando hoy no tenerlo resuelto? Si lo que construimos juntos mejora cómo te ve tu mercado y te acerca más clientes, el costo real es el de no hacerlo.</div>
+      <button class="copy-btn" onclick="cp(2,this)"><svg width="13" height="13" viewBox="0 0 13 13" fill="none"><rect x="4" y="4" width="8" height="8" rx="1.5" stroke="currentColor" stroke-width="1.4"/><path d="M1 9V2.5A1.5 1.5 0 012.5 1H9" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/></svg> Copiar script</button>
+    </div>
+    <div class="sc-card">
+      <div class="sc-head">Cuando hacen una oferta muy por debajo</div>
+      <div class="sc-body" id="t3">Aprecio la propuesta, y quiero ser honesto: trabajar en esos términos comprometería el proceso que garantiza el resultado que buscás. Lo que sí puedo hacer es ajustar el alcance — pero siendo completamente claros sobre qué queda adentro y qué queda afuera.</div>
+      <button class="copy-btn" onclick="cp(3,this)"><svg width="13" height="13" viewBox="0 0 13 13" fill="none"><rect x="4" y="4" width="8" height="8" rx="1.5" stroke="currentColor" stroke-width="1.4"/><path d="M1 9V2.5A1.5 1.5 0 012.5 1H9" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/></svg> Copiar script</button>
+    </div>
+  </div>  </div>
+  <div class="hook">→ Sabés qué decir. ¿Sabés exactamente cuánto vale cada hora de tu vida profesional?</div>
+  <div class="hint" style="color:rgba(0,0,0,.16)"><svg width="14" height="18" viewBox="0 0 14 18" fill="none"><path d="M7 2v14M2 11l5 5 5-5" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+</section>
+
+<!-- ══ 13 · TU NÚMERO ══ -->
+<section class="s s--sand" id="s13">
+  <div class="s-body">
+  <div class="eyebrow">06 · Tu Número</div>
+  <div class="h1">Calculadora<br>de tarifa real</div>
+  <p style="font-size:13.5px;color:var(--text-2);margin-bottom:4px">Una tarifa que no cubre costos e impuestos no es una tarifa — es un descuento encubierto.</p>
+  <div class="calc-card">
+    <div class="fields">
+      <div class="field">
+        <label>Ingreso mensual deseado (neto, USD)</label>
+        <input type="number" id="ci" value="3000" min="0" inputmode="numeric" oninput="doCalc()">
+      </div>
+      <div class="field-row">
+        <div class="field">
+          <label>Proyectos por mes</label>
+          <input type="number" id="cp" value="2" min="1" inputmode="numeric" oninput="doCalc()">
+        </div>
+        <div class="field">
+          <label>Impuestos %</label>
+          <input type="number" id="ct" value="19" min="0" max="60" inputmode="numeric" oninput="doCalc();clearP()">
+        </div>
+      </div>
+      <div>
+        <div style="font-size:10px;font-weight:800;text-transform:uppercase;letter-spacing:.12em;color:var(--text-3);margin-bottom:6px">Presets de impuestos</div>
+        <div class="presets">
+          <button class="pbtn on" id="pco" onclick="setT(19,'co')">🇨🇴 CO 19%</button>
+          <button class="pbtn" id="pla" onclick="setT(20,'la')">🌎 LATAM 20%</button>
+          <button class="pbtn" id="peu" onclick="setT(30,'eu')">🇪🇺 Europa 30%</button>
+        </div>
+      </div>
+    </div>
+    <button class="adv-toggle" id="advbtn" onclick="togAdv()">
+      <svg width="13" height="13" viewBox="0 0 13 13" fill="none"><path d="M6.5 1v11M1 6.5h11" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
+      Modo avanzado — costos, tiempo y cuotas
+    </button>
+    <div class="adv-body" id="advbody">
+      <div class="fields" style="margin-bottom:14px">
+        <div class="adv-ttl">⏱ Tiempo por proyecto</div>
+        <div class="field-row">
+          <div class="field"><label>Semanas de desarrollo</label><input type="number" id="cwk" value="4" min="1" inputmode="numeric" oninput="doCalc()"></div>
+          <div class="field"><label>Horas por semana</label><input type="number" id="chs" value="15" min="1" inputmode="numeric" oninput="doCalc()"></div>
+        </div>
+      </div>
+      <div class="fields" style="margin-bottom:14px">
+        <div class="adv-ttl">💸 Costos</div>
+        <div class="field"><label>Gastos fijos mensuales (software, apps, herramientas)</label><input type="number" id="cfx" value="200" min="0" inputmode="numeric" oninput="doCalc()"></div>
+        <div class="field"><label>Gastos por proyecto (reuniones, materiales, lobby)</label><input type="number" id="cpe" value="100" min="0" inputmode="numeric" oninput="doCalc()"></div>
+      </div>
+      <div class="fields" style="margin-bottom:14px">
+        <div class="adv-ttl">💳 Cuotas de pago</div>
+        <div class="presets">
+          <button class="pbtn on" id="q2" onclick="setQ(2)">2 cuotas</button>
+          <button class="pbtn" id="q3" onclick="setQ(3)">3 cuotas</button>
+        </div>
+      </div>
+      <div class="sep"></div>
+    </div>
+    <div class="outputs" id="outs"></div>
+  </div>
+  <p class="calc-note">El precio ancla (3×) es lo que cotizás primero. Aunque lo rechacen, tu precio real parecerá razonable — y tu voz no temblará.</p>  </div>
+  <div class="hook">→ Tenés el número. ¿Tenés todo lo demás en orden?</div>
+  <div class="hint" style="color:rgba(0,0,0,.16)"><svg width="14" height="18" viewBox="0 0 14 18" fill="none"><path d="M7 2v14M2 11l5 5 5-5" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+</section>
+
+<!-- ══ 14 · LA LISTA ══ -->
+<section class="s s--cream" id="s14">
+  <div class="s-body">
+  <div class="eyebrow">07 · La Lista</div>
+  <div class="h1" style="font-size:clamp(24px,6.5vw,38px)">Lo que hace que<br>tu voz no tiemble</div>
+  <div class="body">
+    <p>El sistema completo vive en estos siete puntos. Cuando los tenés todos en orden, cobrar bien deja de ser un acto de valentía. Es simplemente una conversación con alguien que ya confía en vos.</p>
+  </div>
+  <div class="cl-wrap" id="cl"></div>
+  <p style="font-size:11px;color:var(--text-3);margin-top:10px">Tu progreso se guarda automáticamente en este dispositivo.</p>  </div>
+  <div class="hook">→ Antes de cerrar: las fuentes que construyeron este sistema.</div>
+  <div class="hint" style="color:rgba(0,0,0,.16)"><svg width="14" height="18" viewBox="0 0 14 18" fill="none"><path d="M7 2v14M2 11l5 5 5-5" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+</section>
+
+<!-- ══ 15 · BIBLIOGRAFÍA ══ -->
+<section class="s s--sand" id="s15">
+  <div class="s-body">
+  <div class="eyebrow">08 · Fuentes</div>
+  <div class="h1" style="font-size:clamp(22px,6vw,34px)">Bibliografía<br>y referencias</div>
+  <div class="bib-section">Estudios académicos</div>
+  <div class="bib-list">
+    <div class="bib-item">
+      <strong>El efecto de anclaje en la estimación y negociación</strong>
+      Tversky, A., &amp; Kahneman, D. (1974). Judgment under Uncertainty: Heuristics and Biases. <em>Science</em>, 185(4157), 1124–1131.
+    </div>
+    <div class="bib-item">
+      <strong>La primera oferta como ancla en negociaciones</strong>
+      Galinsky, A.D., &amp; Mussweiler, T. (2001). First offers as anchors: The role of perspective-taking and negotiator focus. <em>Journal of Personality and Social Psychology</em>, 81(4), 657–669.
+    </div>
+    <div class="bib-item">
+      <strong>El precio como constructor de preferencias (arbitrariedad coherente)</strong>
+      Ariely, D., Loewenstein, G., &amp; Prelec, D. (2003). Coherent Arbitrariness: Stable Demand Curves Without Stable Preferences. <em>Quarterly Journal of Economics</em>, 118(1), 73–105.
+    </div>
+    <div class="bib-item">
+      <strong>El efecto placebo del precio en la percepción de calidad</strong>
+      Shiv, B., Carmon, Z., &amp; Ariely, D. (2005). Placebo Effects of Marketing Actions: Consumers May Get What They Pay For. <em>Journal of Marketing Research</em>, 42(4), 383–393.
+    </div>
+    <div class="bib-item">
+      <strong>El síndrome del impostor en profesionales de alto desempeño</strong>
+      Clance, P.R., &amp; Imes, S.A. (1978). The Imposter Phenomenon in High Achieving Women: Dynamics and Therapeutic Intervention. <em>Psychotherapy: Theory, Research &amp; Practice</em>, 15(3), 241–247.
+    </div>
+  </div>
+  <div class="bib-section" style="margin-top:14px">Libros</div>
+  <div class="bib-list">
+    <div class="bib-item">
+      <strong>The Win Without Pitching Manifesto</strong>
+      Enns, B. (2010). RockBench Publishing. — Posicionamiento y pricing para profesionales creativos.
+    </div>
+    <div class="bib-item">
+      <strong>Never Split the Difference</strong>
+      Voss, C. (2016). Harper Business. — Técnicas de negociación del FBI aplicadas a negocios.
+    </div>
+    <div class="bib-item">
+      <strong>Predictably Irrational</strong>
+      Ariely, D. (2008). Harper Collins. — Sesgos cognitivos y decisiones de precio.
+    </div>
+    <div class="bib-item">
+      <strong>Thinking, Fast and Slow</strong>
+      Kahneman, D. (2011). Farrar, Straus and Giroux. — Heurísticas, sesgos y toma de decisiones.
+    </div>
+  </div>  </div>
+  <div class="hint" style="color:rgba(0,0,0,.16)"><svg width="14" height="18" viewBox="0 0 14 18" fill="none"><path d="M7 2v14M2 11l5 5 5-5" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+</section>
+
+<!-- ══ 16 · EL MANIFIESTO ══ -->
+<section class="s s--dark" id="s16">
+  <div class="s-body">
+  <div class="eyebrow" style="opacity:.26">09 · El Manifiesto</div>
+  <div class="mani">
+    Tenés talento. Eso nunca fue el problema.<br><br>
+    El problema era que <strong>veías tu trabajo hermoso, pero no valioso</strong>. Que te formaron para ser el mejor haciendo — pero no para cobrar por ello.<br><br>
+    Ese sistema no fue diseñado para perjudicarte. Simplemente no fue diseñado para ayudarte. <em>La academia enseña el oficio. El precio lo aprendés solo, en el campo.</em><br><br>
+    Hoy tenés el mapa que nadie te dio. Sabés cómo anclar, cómo reencuadrar, cómo poner la casa en orden. Tenés los scripts. Tenés el número calculado.<br><br>
+    <strong>No hay razón para que la voz tiemble.</strong><br><br>
+    Proyectate como el consultor de lujo que podés ser. No como alguien que sobrevive entre proyectos. Cobrar bien no es arrogancia — es <strong>respeto por el trabajo que hacés y por la persona que lo hace</strong>.<br><br>
+    Seguí trabajando. Tenés con qué. <strong>Estructurate más.</strong>
+    <span style="display:block;font-size:13px;color:rgba(255,255,255,.3);font-style:italic;margin-top:8px">Y conseguite una factura, por favor. 😄</span>
+  </div>
+  <div id="ticket" style="display:none">
+    <div class="tkt-label">✦ Mi compromiso de precio</div>
+    <div class="tkt-grid" id="tkt-grid"></div>
+    <div class="tkt-foot">
+      <span>Deja de Regalar Tu Trabajo</span>
+      <span>Read &amp; Play Studio · 2026</span>
+    </div>
+  </div>
+  <div class="mf">
+    <span class="mf-brand">Read &amp; Play Studio</span>
+    <span class="mf-num">Edición Extendida · 002 · 2026</span>
+  </div>
+  </div>
+</section>
+
+</div><!-- /#book -->
+
+<script>
+// ═══ LICENSE GATE ═══
+// Reemplaza PRODUCT_PERMALINK con el permalink real de tu producto en Gumroad
+// (la parte que va después de gumroad.com/l/ en la URL de tu producto)
+var GUMROAD_PERMALINK = 'PRODUCT_PERMALINK';
+var GATE_STORAGE_KEY  = 'drtj_v1_access';
+
+(function initGate() {
+  try {
+    var saved = localStorage.getItem(GATE_STORAGE_KEY);
+    if (saved) {
+      var data = JSON.parse(saved);
+      if (data && data.ok) { unlockContent(false); return; }
+    }
+  } catch(e) {}
+  // Gate queda visible (es el estado por defecto del CSS)
+  setTimeout(function() {
+    var ki = document.getElementById('gate-key');
+    if (ki) ki.focus();
+  }, 350);
+  document.getElementById('gate-key').addEventListener('keydown', function(e) {
+    if (e.key === 'Enter') verifyLicense();
+  });
+})();
+
+function verifyLicense() {
+  var keyInput = document.getElementById('gate-key');
+  var errDiv   = document.getElementById('gate-err');
+  var btn      = document.getElementById('gate-btn');
+  var key      = keyInput.value.trim();
+
+  if (!key || key.length < 6) {
+    errDiv.textContent = 'Por favor ingresa tu clave de licencia.';
+    return;
+  }
+
+  btn.disabled     = true;
+  btn.textContent  = 'Verificando…';
+  errDiv.textContent = '';
+
+  fetch('https://api.gumroad.com/v2/licenses/verify', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+    body: 'product_permalink=' + encodeURIComponent(GUMROAD_PERMALINK) +
+          '&license_key='      + encodeURIComponent(key) +
+          '&increment_uses_count=false'
+  })
+  .then(function(r) { return r.json(); })
+  .then(function(data) {
+    if (data.success) {
+      try { localStorage.setItem(GATE_STORAGE_KEY, JSON.stringify({ ok: true, key: key })); } catch(e) {}
+      unlockContent(true);
+    } else {
+      errDiv.textContent = 'Clave inválida. Revisa el email de confirmación de tu compra.';
+      btn.disabled    = false;
+      btn.textContent = 'Acceder →';
+    }
+  })
+  .catch(function() {
+    errDiv.textContent = 'Sin conexión. Verifica tu internet e intenta de nuevo.';
+    btn.disabled    = false;
+    btn.textContent = 'Acceder →';
+  });
+}
+
+function unlockContent(animate) {
+  var gate = document.getElementById('gate');
+  if (!animate) {
+    gate.classList.add('g-gone');
+    return;
+  }
+  gate.classList.add('g-hide');
+  setTimeout(function() { gate.classList.add('g-gone'); }, 480);
+}
+
+// ═══ PROGRESS + STAGGERED ANIMATIONS ═══
+const secs  = document.querySelectorAll('.s');
+const TOTAL = secs.length;
+const prog  = document.getElementById('prog');
+const ctr   = document.getElementById('ctr');
+const DARK  = new Set(['s1','s16']);
+const book  = document.getElementById('book');
+
+// Auto-assign animation delay classes
+document.querySelectorAll('.eyebrow').forEach(el => el.classList.add('anim','d1'));
+document.querySelectorAll('.h1').forEach(el => el.classList.add('anim','d2'));
+document.querySelectorAll('.h2').forEach(el => el.classList.add('anim','d2'));
+document.querySelectorAll('.body').forEach(el => el.classList.add('anim','d3'));
+document.querySelectorAll('.rule').forEach(el => el.classList.add('anim','d3'));
+document.querySelectorAll('.layers,.checks,.sc-list,.stat-row,.cite,.pivot,.hbox,.scripts,.calc-card,.cl-wrap,.bib-list').forEach((el,i) => el.classList.add('anim','d4'));
+
+// ═══ SCROLL-BASED VISIBILITY ═══
+// getBoundingClientRect() funciona sin importar qué container scrollea
+// (book, window, o el WKWebView de QuickLook). Es la medida más universal.
+let _curIdx = -1;
+
+function updateVisibility() {
+  const vh = window.innerHeight;
+  let topVis = -1;
+
+  secs.forEach(function(sec, idx) {
+    const r    = sec.getBoundingClientRect();
+    // Píxeles de la sección visibles en el viewport real del dispositivo
+    const visH = Math.max(0, Math.min(r.bottom, vh) - Math.max(r.top, 0));
+    const isVis = visH > vh * 0.10; // 10% del viewport → activa
+
+    sec.classList.toggle('visible', isVis);
+    if (isVis && topVis === -1) topVis = idx;
+  });
+
+  if (topVis >= 0 && topVis !== _curIdx) {
+    _curIdx = topVis;
+    const i = topVis + 1;
+    prog.style.width = (i / TOTAL * 100) + '%';
+    ctr.textContent  = i + ' / ' + TOTAL;
+    ctr.className    = DARK.has(secs[topVis].id) ? 'cl' : 'cd';
+    if (secs[topVis].id === 's16') buildTicket();
+  }
+}
+
+// Escuchar en book Y en window — QuickLook a veces scrollea el window,
+// no el overflow container. Cubrimos ambos casos.
+book.addEventListener('scroll',   updateVisibility, { passive: true });
+window.addEventListener('scroll', updateVisibility, { passive: true });
+
+// Correr en load, tras fonts, y fallback agresivo a 1.5s
+// que garantiza que s1 siempre sea visible aunque el scroll no dispare.
+updateVisibility();
+setTimeout(updateVisibility, 300);
+setTimeout(updateVisibility, 800);
+if (document.fonts && document.fonts.ready) {
+  document.fonts.ready.then(updateVisibility);
+}
+
+// ─── FALLBACK DE SEGURIDAD ───────────────────────────────────────────────────
+// Si a los 1.5s alguna sección con contenido sigue sin .visible (scroll nunca
+// disparó), forzamos todas las secciones visibles para que .anim no quede
+// bloqueado en opacity:0. Los efectos se reproducen igual desde ese momento.
+setTimeout(function() {
+  secs.forEach(function(sec) { sec.classList.add('visible'); });
+  _curIdx = 0;
+  prog.style.width = (1 / TOTAL * 100) + '%';
+  ctr.textContent  = '1 / ' + TOTAL;
+  updateVisibility(); // Re-detecta la posición real si el scroll ya funcionó
+}, 1500);
+
+// ═══ COPY SCRIPTS ═══
+function cp(n, btn) {
+  const txt = document.getElementById('t' + n).textContent.trim();
+  // Tactile feedback
+  btn.style.transform = 'scale(0.94)';
+  setTimeout(() => btn.style.transform = '', 120);
+  const ok = () => {
+    const orig = btn.innerHTML;
+    btn.innerHTML = '<svg width="13" height="13" viewBox="0 0 13 13" fill="none"><path d="M2 7l3.5 3.5 5.5-6" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg> ¡Copiado!';
+    btn.classList.add('ok');
+    setTimeout(() => { btn.innerHTML = orig; btn.classList.remove('ok'); }, 2500);
+  };
+  if (navigator.clipboard) navigator.clipboard.writeText(txt).then(ok).catch(() => fb(txt, ok));
+  else fb(txt, ok);
+}
+function fb(txt, cb) {
+  const ta = Object.assign(document.createElement('textarea'), { value: txt });
+  ta.style.cssText = 'position:fixed;opacity:0';
+  document.body.appendChild(ta); ta.select();
+  document.execCommand('copy'); ta.remove(); cb();
+}
+
+// ═══ CALCULATOR ═══
+let qn = 2, advOpen = false;
+function setT(v, id) {
+  document.getElementById('ct').value = v;
+  ['co','la','eu'].forEach(k => document.getElementById('p'+k).className = 'pbtn'+(k===id?' on':''));
+  doCalc();
+}
+function clearP() { ['co','la','eu'].forEach(k => document.getElementById('p'+k).className = 'pbtn'); }
+function setQ(n) {
+  qn = n;
+  document.getElementById('q2').className = 'pbtn'+(n===2?' on':'');
+  document.getElementById('q3').className = 'pbtn'+(n===3?' on':'');
+  doCalc();
+}
+function togAdv() {
+  advOpen = !advOpen;
+  document.getElementById('advbody').className = 'adv-body'+(advOpen?' open':'');
+  const b = document.getElementById('advbtn');
+  b.className = 'adv-toggle'+(advOpen?' open':'');
+  b.innerHTML = advOpen
+    ? '<svg width="13" height="13" viewBox="0 0 13 13" fill="none"><path d="M1 6.5h11" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg> Ocultar modo avanzado'
+    : '<svg width="13" height="13" viewBox="0 0 13 13" fill="none"><path d="M6.5 1v11M1 6.5h11" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg> Modo avanzado — costos, tiempo y cuotas';
+  doCalc();
+}
+function f(n) { return '$' + Math.max(0, Math.round(n)).toLocaleString('en-US'); }
+function fh(n) { return '$' + Math.max(0, n).toFixed(1).replace(/\.0$/, ''); }
+
+function doCalc() {
+  const inc  = parseFloat(document.getElementById('ci').value)  || 0;
+  const proj = Math.max(1, parseFloat(document.getElementById('cp').value) || 1);
+  const tax  = Math.min(0.99, (parseFloat(document.getElementById('ct').value) || 0) / 100);
+  const wks  = parseFloat(document.getElementById('cwk').value) || 4;
+  const hrs  = parseFloat(document.getElementById('chs').value) || 15;
+  const cfx  = parseFloat(document.getElementById('cfx').value) || 0;
+  const cpe  = parseFloat(document.getElementById('cpe').value) || 0;
+
+  const grossM  = inc / (1 - tax);
+  const minProj = (grossM + cfx) / proj + cpe;
+  const anchor  = minProj * 3;
+  const anti    = minProj * 0.45;
+  const totHrs  = wks * hrs;
+  const hrRate  = totHrs > 0 ? minProj / totHrs : 0;
+
+  const rows = [
+    { cls:'main',   lbl:'Tu tarifa mínima por proyecto',              val: f(minProj) },
+    { cls:'anchor', lbl:'Precio ancla — cotizá esto primero (3×)',    val: f(anchor)  },
+    { cls:'',       lbl:'Anticipo recomendado (45%)',                  val: f(anti)    },
+    { cls:'',       lbl:`Bruto mensual necesario (inc. ${Math.round(tax*100)}% impuesto)`, val: f(grossM) },
+  ];
+
+  if (advOpen) {
+    rows.push({ cls:'sub', lbl:`Tarifa por hora real (${Math.round(totHrs)}h/proyecto)`, val: fh(hrRate)+'/h' });
+    if (qn === 2) {
+      rows.push({ cls:'sub', lbl:'Cuota 1 — Anticipo 50%', val: f(minProj*.5) });
+      rows.push({ cls:'sub', lbl:'Cuota 2 — Cierre 50%',   val: f(minProj*.5) });
+    } else {
+      rows.push({ cls:'sub', lbl:'Cuota 1 — Anticipo 45%', val: f(minProj*.45) });
+      rows.push({ cls:'sub', lbl:'Cuota 2 — Avance 35%',   val: f(minProj*.35) });
+      rows.push({ cls:'sub', lbl:'Cuota 3 — Cierre 20%',   val: f(minProj*.20) });
+    }
+    const netProj = minProj * (1 - tax) - cpe;
+    rows.push({ cls:'sub', lbl:'Lo que realmente recibís por proyecto', val: f(netProj) });
+  }
+
+  document.getElementById('outs').innerHTML = rows.map(r =>
+    `<div class="out ${r.cls}"><span class="out-lbl">${r.lbl}</span><span class="out-val${r.cls==='sub'?' sm':''}">${r.val}</span></div>`
+  ).join('');
+  // Slot machine: animate each output value
+  document.querySelectorAll('#outs .out-val').forEach(el => {
+    const raw = el.textContent.trim();
+    const isHr = raw.includes('/h');
+    const numStr = raw.replace(/[$,\/h]/g, '');
+    const num = parseFloat(numStr);
+    if (!isNaN(num) && num > 0) {
+      el.textContent = isHr ? '$0/h' : '$0';
+      tickNum(el, num, isHr);
+    }
+  });
+}
+doCalc();
+
+// ═══ CHECKLIST ═══
+const ITEMS = [
+  'Tengo un sistema de facturación activo',
+  'Tengo un contrato-tipo para clientes nuevos',
+  'Mi deck de servicios refleja mi nivel actual',
+  'Mi website comunica a quién sirvo y cómo',
+  'Sé exactamente cuánto quiero ganar este mes y tengo el número calculado',
+  'Conozco mi tarifa mínima y mi precio ancla (3×)',
+  'He practicado mis scripts de precio en voz alta al menos una vez',
+];
+const KEY = 'drtt-v1';
+function loadCL() { try { return JSON.parse(localStorage.getItem(KEY)) || []; } catch (e) { return []; } }
+function saveCL(a) { try { localStorage.setItem(KEY, JSON.stringify(a)); } catch (e) {} }
+function renderCL() {
+  const saved = loadCL();
+  const wrap  = document.getElementById('cl');
+  wrap.innerHTML = '';
+  let n = 0;
+  ITEMS.forEach((item, i) => {
+    const on = saved.includes(i); if (on) n++;
+    const d = document.createElement('div');
+    d.className = 'ci' + (on ? ' on' : '');
+    d.innerHTML = `<div class="cb">${on?'✓':''}</div><div class="ct">${item}</div>`;
+    d.onclick = () => {
+      // Pop animation on checkbox
+      const cb = d.querySelector('.cb');
+      cb.classList.remove('pop');
+      void cb.offsetWidth; // reflow
+      cb.classList.add('pop');
+      cb.addEventListener('animationend', () => cb.classList.remove('pop'), { once: true });
+      const s = loadCL(), ix = s.indexOf(i);
+      if (ix >= 0) s.splice(ix, 1); else s.push(i);
+      saveCL(s); renderCL();
+    };
+    wrap.appendChild(d);
+  });
+  const pct = Math.round(n / ITEMS.length * 100);
+  const bar = document.createElement('div');
+  const fillCls = pct === 100 ? 'cl-fill done' : 'cl-fill';
+  const pctCls  = pct === 100 ? 'cl-pct done'  : 'cl-pct';
+  bar.className = 'cl-prog';
+  bar.innerHTML = `<div class="cl-track"><div class="${fillCls}" style="width:${pct}%"></div></div><div class="${pctCls}">${pct}%</div>`;
+  wrap.appendChild(bar);
+  // Confetti burst at 100%
+  if (pct === 100 && n > 0) {
+    setTimeout(() => {
+      const rect = bar.getBoundingClientRect();
+      burst(rect.left + rect.width / 2, rect.top + rect.height / 2);
+    }, 120);
+  }
+}
+renderCL();
+
+// ═══ NUMBER TICKER (slot machine) ═══
+function tickNum(el, target, isHr) {
+  const dur = 620, t0 = performance.now();
+  const isDecimal = isHr && !Number.isInteger(target);
+  (function run(now) {
+    const p = Math.min((now - t0) / dur, 1);
+    const eased = 1 - Math.pow(1 - p, 3); // cubic ease-out
+    const cur = eased * target;
+    el.textContent = '$' + (isDecimal ? cur.toFixed(1) : Math.round(cur).toLocaleString('en-US')) + (isHr ? '/h' : '');
+    if (p < 1) requestAnimationFrame(run);
+  })(t0);
+}
+
+// ═══ CONFETTI BURST ═══
+function burst(x, y) {
+  const cols = ['#c95200','#fdeee5','#f7f4ee','#ffffff','#a34200','#fed7aa'];
+  for (let i = 0; i < 16; i++) {
+    const el = document.createElement('div');
+    const sz = 4 + Math.random() * 5;
+    const round = Math.random() > 0.4;
+    el.style.cssText = `position:fixed;width:${sz}px;height:${sz}px;border-radius:${round?'50%':'2px'};background:${cols[i%cols.length]};left:${x}px;top:${y}px;pointer-events:none;z-index:9999;`;
+    document.body.appendChild(el);
+    const angle = ((i / 16) * Math.PI * 2) + (Math.random() - .5) * .8;
+    const dist  = 30 + Math.random() * 60;
+    requestAnimationFrame(() => {
+      el.style.transition = `transform ${0.45 + Math.random() * 0.35}s cubic-bezier(.25,.46,.45,.94), opacity 0.5s ease`;
+      el.style.transform  = `translate(${Math.cos(angle)*dist}px, ${Math.sin(angle)*dist - 25}px) rotate(${Math.random()*360}deg)`;
+      el.style.opacity    = '0';
+    });
+    setTimeout(() => el.remove(), 900);
+  }
+}
+
+// ═══ FONT SIZE TOGGLE ═══
+const FKEY = 'drtt-font';
+function toggleFont() {
+  const large = document.body.classList.toggle('large-text');
+  const btn = document.getElementById('font-btn');
+  btn.classList.toggle('large', large);
+  btn.textContent = large ? 'Aa ↑' : 'Aa';
+  try { localStorage.setItem(FKEY, large ? '1' : '0'); } catch (e) {}
+}
+// Restore saved font preference
+(function() {
+  try {
+    if (localStorage.getItem(FKEY) === '1') {
+      document.body.classList.add('large-text');
+      const btn = document.getElementById('font-btn');
+      btn.classList.add('large');
+      btn.textContent = 'Aa ↑';
+    }
+  } catch (e) {}
+})();
+
+// ═══ BUILD TICKET (shareable commitment card) ═══
+function buildTicket() {
+  const inc   = parseFloat(document.getElementById('ci').value)  || 3000;
+  const tax   = parseFloat(document.getElementById('ct').value)  || 19;
+  const proj  = Math.max(1, parseFloat(document.getElementById('cp').value) || 2);
+  const cfx   = parseFloat(document.getElementById('cfx') ? document.getElementById('cfx').value : 0) || 0;
+  const cpe   = parseFloat(document.getElementById('cpe') ? document.getElementById('cpe').value : 0) || 0;
+  const grossM  = inc / (1 - tax / 100);
+  const minProj = (grossM + cfx) / proj + cpe;
+  const anchor  = minProj * 3;
+  const f = n => '$' + Math.round(n).toLocaleString('en-US');
+  document.getElementById('tkt-grid').innerHTML = `
+    <div><div class="tkt-k">Meta mensual neta</div><div class="tkt-v">${f(inc)}</div></div>
+    <div><div class="tkt-k">Tarifa mínima / proyecto</div><div class="tkt-v acc">${f(minProj)}</div></div>
+    <div><div class="tkt-k">Precio ancla (3×)</div><div class="tkt-v">${f(anchor)}</div></div>
+    <div><div class="tkt-k">Impuestos aplicados</div><div class="tkt-v">${tax}%</div></div>
+  `;
+  const tkt = document.getElementById('ticket');
+  tkt.style.display = '';
+  tkt.classList.add('anim','d5');
+  requestAnimationFrame(() => tkt.closest('.s').classList.contains('visible') && (tkt.style.opacity = '', tkt.style.transform = ''));
+}
+
+// ── Mover .hook dentro de .s-body ──────────────────────────────────────────
+// El hook pasa a ser el último elemento del flex column → siempre aparece
+// después de todo el contenido, nunca puede tapar texto intermedio.
+document.querySelectorAll('.s').forEach(function(sec) {
+  var hook  = sec.querySelector(':scope > .hook');
+  var sBody = sec.querySelector(':scope > .s-body');
+  if (hook && sBody) sBody.appendChild(hook);
+});
+
+// ═══ TOUCH SNAP HELPER ═══
+// CSS scroll-snap funciona en Safari y WKWebView (iOS 13+), pero el previsualizador
+// de archivos a veces no dispara el snap. Este helper detecta swipes claros y
+// fuerza el scroll al siguiente/anterior section vía scrollIntoView.
+(function snapHelper() {
+  const book   = document.getElementById('book');
+  const SECTS  = () => document.querySelectorAll('.s');
+  let ty0 = 0, tx0 = 0, t0 = 0, locked = false;
+
+  book.addEventListener('touchstart', function(e) {
+    ty0 = e.touches[0].clientY;
+    tx0 = e.touches[0].clientX;
+    t0  = Date.now();
+    locked = false;
+  }, { passive: true });
+
+  book.addEventListener('touchend', function(e) {
+    if (locked) return;
+
+    // Si el desplazamiento vertical es pequeño podría ser un tap — no interferir
+    const sBody = e.target.closest('.s-body');
+
+    const dy  = ty0 - e.changedTouches[0].clientY;
+    const dx  = tx0 - e.changedTouches[0].clientX;
+    const dt  = Date.now() - t0;
+
+    // Ignorar swipes más horizontales que verticales
+    if (Math.abs(dx) > Math.abs(dy) * 1.2) return;
+
+    // Swipe corto lento → el snap nativo se encarga
+    if (Math.abs(dy) < 25 && dt > 400) return;
+
+    const vh     = window.innerHeight;
+    const curr   = Math.round(book.scrollTop / vh);
+    const sects  = SECTS();
+    let next = curr;
+
+    if      (dy >  30 || (dy >  12 && dt < 380)) next = Math.min(curr + 1, sects.length - 1);
+    else if (dy < -30 || (dy < -12 && dt < 380)) next = Math.max(curr - 1, 0);
+
+    if (next !== curr) {
+      locked = true;
+      sects[next].scrollIntoView({ behavior: 'smooth', block: 'start' });
+      setTimeout(() => { locked = false; }, 600);
+    }
+  }, { passive: true });
+})();
+</script>
+</body>
+</html>
