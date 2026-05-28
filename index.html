@@ -28,25 +28,40 @@
   --green:   #15803d;
 }
 
-#book {
-  /* Scroll libre — el documento completo scrollea, no un contenedor bloqueado */
+/* Contenedor raíz — viewport fijo, el scroll ocurre dentro de cada sección */
+html, body {
+  height: 100%; height: 100dvh;
+  overflow: hidden;
+  margin: 0; padding: 0;
 }
-html { scroll-behavior: smooth; }
 body {
   font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, sans-serif;
   -webkit-font-smoothing: antialiased;
   background: var(--dark);
   font-size: 16px; line-height: 1.6;
 }
-
-/* ─── Sections ─── */
-.s {
-  min-height: 100vh; min-height: 100dvh;
+#book {
   position: relative;
-  overflow: visible;
+  width: 100%; height: 100%;
+  overflow: hidden;
 }
-/* La portada siempre ocupa exactamente una pantalla */
-#s1 { height: 100vh; height: 100dvh; overflow: hidden; }
+
+/* ─── Sections — cada una es una página independiente ─── */
+.s {
+  /* Ocupa todo el viewport, fuera de pantalla por debajo por defecto */
+  position: absolute;
+  inset: 0;
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
+  overscroll-behavior-y: contain;
+  transform: translateY(100%);
+  transition: transform 0.46s cubic-bezier(0.4, 0, 0.2, 1);
+  will-change: transform;
+}
+/* Sección activa — visible */
+.s.s--active { transform: translateY(0); }
+/* Sección pasada — sale por arriba */
+.s.s--past   { transform: translateY(-100%); }
 .s--dark  { background: var(--dark);  color: var(--white); }
 .s--cream { background: var(--cream); color: var(--text);  }
 .s--sand  { background: var(--sand);  color: var(--text);  }
@@ -55,7 +70,7 @@ body {
 .s-body {
   padding: calc(38px + env(safe-area-inset-top, 0px))
            calc(28px + env(safe-area-inset-right, 0px))
-           calc(48px + env(safe-area-inset-bottom, 0px))
+           calc(80px + env(safe-area-inset-bottom, 0px))
            calc(28px + env(safe-area-inset-left, 0px));
   display: flex;
   flex-direction: column;
@@ -1029,12 +1044,14 @@ function unlockContent(animate) {
 }
 
 // ═══ PROGRESS + STAGGERED ANIMATIONS ═══
-const secs  = document.querySelectorAll('.s');
-const TOTAL = secs.length;
-const prog  = document.getElementById('prog');
-const ctr   = document.getElementById('ctr');
-const DARK  = new Set(['s1','s16']);
-const book  = document.getElementById('book');
+const secs    = document.querySelectorAll('.s');
+const TOTAL   = secs.length;
+const prog    = document.getElementById('prog');
+const ctr     = document.getElementById('ctr');
+const DARK    = new Set(['s1','s16']);
+const book    = document.getElementById('book');
+const navPrev = document.getElementById('nav-prev');
+const navNext = document.getElementById('nav-next');
 
 // Auto-assign animation delay classes
 document.querySelectorAll('.eyebrow').forEach(el => el.classList.add('anim','d1'));
@@ -1044,60 +1061,38 @@ document.querySelectorAll('.body').forEach(el => el.classList.add('anim','d3'));
 document.querySelectorAll('.rule').forEach(el => el.classList.add('anim','d3'));
 document.querySelectorAll('.layers,.checks,.sc-list,.stat-row,.cite,.pivot,.hbox,.scripts,.calc-card,.cl-wrap,.bib-list').forEach((el,i) => el.classList.add('anim','d4'));
 
-// ═══ SCROLL-BASED VISIBILITY ═══
-// getBoundingClientRect() funciona sin importar qué container scrollea
-// (book, window, o el WKWebView de QuickLook). Es la medida más universal.
-let _curIdx = -1;
+// ═══ NAVEGACIÓN POR PÁGINAS ═══
+let _curIdx = 0;
 
-function updateVisibility() {
-  const vh = window.innerHeight;
-  let topVis = -1;
-
-  secs.forEach(function(sec, idx) {
-    const r    = sec.getBoundingClientRect();
-    // Píxeles de la sección visibles en el viewport real del dispositivo
-    const visH = Math.max(0, Math.min(r.bottom, vh) - Math.max(r.top, 0));
-    const isVis = visH > vh * 0.10; // 10% del viewport → activa
-
-    sec.classList.toggle('visible', isVis);
-    if (isVis && topVis === -1) topVis = idx;
+function activateSection(idx) {
+  secs.forEach(function(sec, i) {
+    sec.classList.remove('s--active', 's--past');
+    if (i < idx)      sec.classList.add('s--past');
+    else if (i === idx) sec.classList.add('s--active');
+    // i > idx → sin clase = translateY(100%), fuera de pantalla abajo
   });
 
-  if (topVis >= 0 && topVis !== _curIdx) {
-    _curIdx = topVis;
-    const i = topVis + 1;
-    prog.style.width = (i / TOTAL * 100) + '%';
-    ctr.textContent  = i + ' / ' + TOTAL;
-    ctr.className    = DARK.has(secs[topVis].id) ? 'cl' : 'cd';
-    updateNavBtns(topVis);
-    if (secs[topVis].id === 's16') buildTicket();
-  }
+  _curIdx = idx;
+
+  // Barra de progreso y contador
+  prog.style.width = ((idx + 1) / TOTAL * 100) + '%';
+  ctr.textContent  = (idx + 1) + ' / ' + TOTAL;
+  ctr.className    = DARK.has(secs[idx].id) ? 'cl' : 'cd';
+
+  // Botones de navegación
+  updateNavBtns(idx);
+
+  // Marcar sección y sus elementos como visibles para activar animaciones
+  secs[idx].classList.add('visible');
+  secs[idx].querySelectorAll('.anim').forEach(function(el) {
+    el.classList.add('visible');
+  });
+
+  if (secs[idx].id === 's16') buildTicket();
 }
 
-// Escuchar en book Y en window — QuickLook a veces scrollea el window,
-// no el overflow container. Cubrimos ambos casos.
-window.addEventListener('scroll', updateVisibility, { passive: true });
-
-// Correr en load, tras fonts, y fallback agresivo a 1.5s
-// que garantiza que s1 siempre sea visible aunque el scroll no dispare.
-updateVisibility();
-setTimeout(updateVisibility, 300);
-setTimeout(updateVisibility, 800);
-if (document.fonts && document.fonts.ready) {
-  document.fonts.ready.then(updateVisibility);
-}
-
-// ─── FALLBACK DE SEGURIDAD ───────────────────────────────────────────────────
-// Si a los 1.5s alguna sección con contenido sigue sin .visible (scroll nunca
-// disparó), forzamos todas las secciones visibles para que .anim no quede
-// bloqueado en opacity:0. Los efectos se reproducen igual desde ese momento.
-setTimeout(function() {
-  secs.forEach(function(sec) { sec.classList.add('visible'); });
-  _curIdx = 0;
-  prog.style.width = (1 / TOTAL * 100) + '%';
-  ctr.textContent  = '1 / ' + TOTAL;
-  updateVisibility(); // Re-detecta la posición real si el scroll ya funcionó
-}, 1500);
+// Arrancar en sección 0
+activateSection(0);
 
 // ═══ COPY SCRIPTS ═══
 function cp(n, btn) {
@@ -1341,15 +1336,13 @@ document.querySelectorAll('.s').forEach(function(sec) {
   if (hook && sBody) sBody.appendChild(hook);
 });
 
-// ═══ TOUCH SNAP HELPER ═══
 // ═══ PREV / NEXT NAVIGATION ═══
-const navPrev = document.getElementById('nav-prev');
-const navNext = document.getElementById('nav-next');
-
 function navigate(dir) {
   var target = _curIdx + dir;
   if (target < 0 || target >= secs.length) return;
-  secs[target].scrollIntoView({ behavior: 'smooth', block: 'start' });
+  // Resetear scroll interno de la sección destino al top
+  secs[target].scrollTop = 0;
+  activateSection(target);
 }
 
 function updateNavBtns(idx) {
@@ -1368,9 +1361,7 @@ function updateNavBtns(idx) {
   navNext.className = theme;
   if (idx === secs.length - 1) {
     navNext.textContent = 'Volver al inicio';
-    navNext.onclick = function() {
-      secs[0].scrollIntoView({ behavior: 'smooth', block: 'start' });
-    };
+    navNext.onclick = function() { activateSection(0); };
   } else {
     navNext.textContent = 'Siguiente →';
     navNext.onclick = function() { navigate(1); };
