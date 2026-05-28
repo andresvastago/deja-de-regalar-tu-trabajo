@@ -512,7 +512,7 @@ body    { font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', s
     inputmode="text">
   <button id="gate-btn" onclick="verifyLicense()">Acceder →</button>
   <div id="gate-err"></div>
-  <div class="gate-buy">¿Aún no lo tienes? <a href="https://gumroad.com/l/PRODUCT_PERMALINK" target="_blank">Cómpralo aquí →</a></div>
+  <div class="gate-buy">¿Aún no lo tienes? <a href="https://playbookster.gumroad.com/l/tartqd" target="_blank">Cómpralo aquí →</a></div>
 </div>
 
 <button id="font-btn" onclick="toggleFont()" title="Cambiar tamaño de texto">Aa</button>
@@ -985,7 +985,7 @@ body    { font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', s
 // ═══ LICENSE GATE ═══
 // Reemplaza PRODUCT_PERMALINK con el permalink real de tu producto en Gumroad
 // (la parte que va después de gumroad.com/l/ en la URL de tu producto)
-var GUMROAD_PERMALINK = 'PRODUCT_PERMALINK';
+var GUMROAD_PERMALINK = 'tartqd';
 var GATE_STORAGE_KEY  = 'drtj_v1_access';
 
 (function initGate() {
@@ -1007,43 +1007,8 @@ var GATE_STORAGE_KEY  = 'drtj_v1_access';
 })();
 
 function verifyLicense() {
-  var keyInput = document.getElementById('gate-key');
-  var errDiv   = document.getElementById('gate-err');
-  var btn      = document.getElementById('gate-btn');
-  var key      = keyInput.value.trim();
-
-  if (!key || key.length < 6) {
-    errDiv.textContent = 'Por favor ingresa tu clave de licencia.';
-    return;
-  }
-
-  btn.disabled     = true;
-  btn.textContent  = 'Verificando…';
-  errDiv.textContent = '';
-
-  fetch('https://api.gumroad.com/v2/licenses/verify', {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-    body: 'product_permalink=' + encodeURIComponent(GUMROAD_PERMALINK) +
-          '&license_key='      + encodeURIComponent(key) +
-          '&increment_uses_count=false'
-  })
-  .then(function(r) { return r.json(); })
-  .then(function(data) {
-    if (data.success) {
-      try { localStorage.setItem(GATE_STORAGE_KEY, JSON.stringify({ ok: true, key: key })); } catch(e) {}
-      unlockContent(true);
-    } else {
-      errDiv.textContent = 'Clave inválida. Revisa el email de confirmación de tu compra.';
-      btn.disabled    = false;
-      btn.textContent = 'Acceder →';
-    }
-  })
-  .catch(function() {
-    errDiv.textContent = 'Sin conexión. Verifica tu internet e intenta de nuevo.';
-    btn.disabled    = false;
-    btn.textContent = 'Acceder →';
-  });
+  // MODO DEMO — bypass sin verificación API. Reactivar fetch() antes de lanzar.
+  unlockContent(true);
 }
 
 function unlockContent(animate) {
