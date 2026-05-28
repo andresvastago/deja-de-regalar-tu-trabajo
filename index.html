@@ -32,8 +32,6 @@
   height: 100vh; height: 100dvh;
   min-height: -webkit-fill-available;
   overflow-y: scroll;
-  /* Snap CSS desactivado — el snapHelper JS controla la navegación entre secciones.
-     Así el scroll interno de herramientas (calculadora, checklist) no compite. */
   scroll-snap-type: none;
   -webkit-overflow-scrolling: touch;
   overscroll-behavior-y: contain;
@@ -498,6 +496,27 @@ body    { font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', s
   text-align: center;
 }
 .gate-buy a { color: rgba(201,82,0,0.7); text-decoration: none; }
+
+/* ─── Prev / Next navigation ─── */
+#nav-prev, #nav-next {
+  position: fixed;
+  bottom: calc(18px + env(safe-area-inset-bottom, 0px));
+  z-index: 200;
+  padding: 9px 18px;
+  font-size: 10px; font-weight: 800; letter-spacing: .12em;
+  text-transform: uppercase; font-family: inherit;
+  border: none; border-radius: 20px; cursor: pointer;
+  transition: opacity 0.25s, background 0.25s, color 0.25s;
+  -webkit-appearance: none;
+}
+#nav-prev { left: calc(20px + env(safe-area-inset-left, 0px)); }
+#nav-next { left: 50%; transform: translateX(-50%); background: var(--accent); color: #fff; }
+#nav-next:active { background: var(--acc-d); }
+/* Prev adapta al fondo de la sección */
+#nav-prev.cl { background: rgba(255,255,255,0.1);  color: rgba(255,255,255,0.55); }
+#nav-prev.cd { background: rgba(0,0,0,0.07);        color: rgba(0,0,0,0.42); }
+#nav-prev:active { opacity: 0.6; }
+#nav-prev[hidden], #nav-next[hidden] { display: none; }
 </style>
 </head>
 <body>
@@ -518,6 +537,8 @@ body    { font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', s
 <button id="font-btn" onclick="toggleFont()" title="Cambiar tamaño de texto">Aa</button>
 <div class="top-bar"><div class="top-fill" id="prog"></div></div>
 <div id="ctr" class="cl">1 / 16</div>
+<button id="nav-prev" class="cl" hidden onclick="navigate(-1)">← Anterior</button>
+<button id="nav-next" class="cl" onclick="navigate(1)">Siguiente →</button>
 
 <div id="book">
 
@@ -1062,6 +1083,7 @@ function updateVisibility() {
     prog.style.width = (i / TOTAL * 100) + '%';
     ctr.textContent  = i + ' / ' + TOTAL;
     ctr.className    = DARK.has(secs[topVis].id) ? 'cl' : 'cd';
+    updateNavBtns(topVis);
     if (secs[topVis].id === 's16') buildTicket();
   }
 }
@@ -1335,52 +1357,40 @@ document.querySelectorAll('.s').forEach(function(sec) {
 });
 
 // ═══ TOUCH SNAP HELPER ═══
-// CSS scroll-snap funciona en Safari y WKWebView (iOS 13+), pero el previsualizador
-// de archivos a veces no dispara el snap. Este helper detecta swipes claros y
-// fuerza el scroll al siguiente/anterior section vía scrollIntoView.
-(function snapHelper() {
-  const book   = document.getElementById('book');
-  const SECTS  = () => document.querySelectorAll('.s');
-  let ty0 = 0, tx0 = 0, t0 = 0, locked = false;
+// ═══ PREV / NEXT NAVIGATION ═══
+const navPrev = document.getElementById('nav-prev');
+const navNext = document.getElementById('nav-next');
 
-  book.addEventListener('touchstart', function(e) {
-    ty0 = e.touches[0].clientY;
-    tx0 = e.touches[0].clientX;
-    t0  = Date.now();
-    locked = false;
-  }, { passive: true });
+function navigate(dir) {
+  var target = _curIdx + dir;
+  if (target < 0 || target >= secs.length) return;
+  secs[target].scrollIntoView({ behavior: 'smooth', block: 'start' });
+}
 
-  book.addEventListener('touchend', function(e) {
-    if (locked) return;
+function updateNavBtns(idx) {
+  var isDark = DARK.has(secs[idx].id);
+  var theme  = isDark ? 'cl' : 'cd';
 
-    // Si el desplazamiento vertical es pequeño podría ser un tap — no interferir
-    const sBody = e.target.closest('.s-body');
+  // Botón anterior: oculto en primera sección
+  if (idx === 0) {
+    navPrev.hidden = true;
+  } else {
+    navPrev.hidden = false;
+    navPrev.className = theme;
+  }
 
-    const dy  = ty0 - e.changedTouches[0].clientY;
-    const dx  = tx0 - e.changedTouches[0].clientX;
-    const dt  = Date.now() - t0;
-
-    // Ignorar swipes más horizontales que verticales
-    if (Math.abs(dx) > Math.abs(dy) * 1.2) return;
-
-    // Swipe corto lento → el snap nativo se encarga
-    if (Math.abs(dy) < 25 && dt > 400) return;
-
-    const vh     = window.innerHeight;
-    const curr   = Math.round(book.scrollTop / vh);
-    const sects  = SECTS();
-    let next = curr;
-
-    if      (dy >  30 || (dy >  12 && dt < 380)) next = Math.min(curr + 1, sects.length - 1);
-    else if (dy < -30 || (dy < -12 && dt < 380)) next = Math.max(curr - 1, 0);
-
-    if (next !== curr) {
-      locked = true;
-      sects[next].scrollIntoView({ behavior: 'smooth', block: 'start' });
-      setTimeout(() => { locked = false; }, 600);
-    }
-  }, { passive: true });
-})();
+  // Botón siguiente: en última sección cambia texto
+  navNext.className = theme;
+  if (idx === secs.length - 1) {
+    navNext.textContent = 'Volver al inicio';
+    navNext.onclick = function() {
+      secs[0].scrollIntoView({ behavior: 'smooth', block: 'start' });
+    };
+  } else {
+    navNext.textContent = 'Siguiente →';
+    navNext.onclick = function() { navigate(1); };
+  }
+}
 </script>
 </body>
 </html>
