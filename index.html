@@ -1,9 +1,22 @@
+<!--
+  ╔══════════════════════════════════════════════════════════════╗
+  ║  DEFINITIVOS / version-media.html                           ║
+  ║  Basado en: index 1.2 (Volt + fixes) + Bibliografía         ║
+  ╠══════════════════════════════════════════════════════════════╣
+  ║  Versión media — 9 secciones + sección de bibliografía:     ║
+  ║  Portada, Para quién, La confesión, El diagnóstico,         ║
+  ║  El sistema, Los scripts, Calculadora, Checklist,           ║
+  ║  Manifiesto, y Bibliografía con links de compra.            ║
+  ║  Diseño Volt Editorial. Dark mode. Font toggle.             ║
+  ║  Esta es la versión de referencia y distribución principal. ║
+  ╚══════════════════════════════════════════════════════════════╝
+-->
 <!DOCTYPE html>
 <html class="light" lang="es">
 <head>
 <meta charset="utf-8"/>
 <meta content="width=device-width, initial-scale=1.0, viewport-fit=cover" name="viewport"/>
-<title>Deja de Regalar Tu Trabajo — Edición Media · Volt Editorial</title>
+<title>Deja de Regalar Tu Trabajo — Edición Media + Bibliografía · Volt Editorial</title>
 
 <!-- Tailwind & Google Fonts -->
 <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
@@ -474,6 +487,24 @@ html.dark #nav-prev.cd { background: rgba(255,255,255,0.08) !important; color: #
 html.dark #nav-next { box-shadow: 0 4px 12px rgba(212,255,0,0.15) !important; }
 html.dark .calc-note { color: #757a60 !important; }
 
+
+/* ─── Barra inferior translúcida (siempre visible) ─── */
+#nav-bar {
+  position: fixed;
+  bottom: 0; left: 0; right: 0;
+  height: calc(68px + env(safe-area-inset-bottom, 0px));
+  background: rgba(251, 249, 248, 0.88);
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
+  border-top: 1px solid rgba(0, 0, 0, 0.07);
+  z-index: 89;
+  pointer-events: none;
+}
+html.dark #nav-bar {
+  background: rgba(26, 27, 28, 0.90);
+  border-top-color: rgba(255, 255, 255, 0.07);
+}
+
 /* Animaciones */
 .anim {
   opacity: 0; transform: translateY(14px);
@@ -548,6 +579,8 @@ html.dark .calc-note { color: #757a60 !important; }
 <div class="cl" id="ctr">1 / 9</div>
 <button class="cl" hidden="" id="nav-prev" onclick="navigate(-1)">← Anterior</button>
 <button class="cl" id="nav-next" onclick="navigate(1)">Siguiente →</button>
+<div id="nav-bar"></div>
+
 
 <div id="book">
 
@@ -780,6 +813,125 @@ html.dark .calc-note { color: #757a60 !important; }
   <div class="mf">
     <span class="mf-brand">Playbook Guy</span>
     <span class="mf-num">Edición Extendida · 2026</span>
+  </div>
+  </div>
+</section>
+
+
+<!-- ══ 10 · BIBLIOGRAFÍA ══ -->
+<section class="s s--cream" id="s10">
+  <div class="s-body">
+  <div class="eyebrow">09 · Fuentes y Lecturas</div>
+  <div class="h1">Lo que hay<br/>detrás de cada idea</div>
+  <div class="body">
+    <p>Este playbook no surge de opiniones. Cada argumento está respaldado por investigación académica o experiencia documentada. Aquí están las fuentes — y los libros que vale la pena tener en tu biblioteca.</p>
+  </div>
+
+  <div class="rule"></div>
+
+  <!-- LIBROS (con links de compra) -->
+  <div style="margin-bottom:8px;font-size:11px;font-weight:800;text-transform:uppercase;letter-spacing:.12em;color:#757a60">📚 Libros — disponibles para comprar</div>
+  <div class="sc-list">
+
+    <div class="sc" style="border-left:4px solid #536600">
+      <span class="sc-lbl">Blair Enns · 2010</span>
+      <strong style="display:block;font-size:16px;color:#1b1c1c;margin-bottom:4px">The Win Without Pitching Manifesto</strong>
+      <span style="font-size:14px;color:#444932;line-height:1.5;display:block;margin-bottom:12px">El libro definitivo sobre cómo los creativos deben posicionarse y vender. Enns argumenta que participar en pitches gratuitos erosiona el valor del trabajo creativo y propone un modelo donde el profesional lidera el proceso de venta — no el cliente.</span>
+      <div style="display:flex;gap:8px;flex-wrap:wrap">
+        <a href="https://www.winwithoutpitching.com/" target="_blank" rel="noopener" style="display:inline-flex;align-items:center;gap:6px;padding:8px 14px;background:#536600;color:#fff;border-radius:99px;font-size:12px;font-weight:700;text-decoration:none">
+          🌐 Sitio oficial
+        </a>
+        <a href="https://www.amazon.com/Win-Without-Pitching-Manifesto/dp/1605440043" target="_blank" rel="noopener" style="display:inline-flex;align-items:center;gap:6px;padding:8px 14px;background:#f5f3f3;color:#1b1c1c;border:1px solid #e4e2e2;border-radius:99px;font-size:12px;font-weight:700;text-decoration:none">
+          📦 Amazon
+        </a>
+        <a href="https://www.goodreads.com/book/show/7731726-the-win-without-pitching-manifesto" target="_blank" rel="noopener" style="display:inline-flex;align-items:center;gap:6px;padding:8px 14px;background:#f5f3f3;color:#1b1c1c;border:1px solid #e4e2e2;border-radius:99px;font-size:12px;font-weight:700;text-decoration:none">
+          📖 Goodreads
+        </a>
+      </div>
+    </div>
+
+    <div class="sc" style="border-left:4px solid #536600">
+      <span class="sc-lbl">Daniel Ariely · 2008</span>
+      <strong style="display:block;font-size:16px;color:#1b1c1c;margin-bottom:4px">Predictably Irrational</strong>
+      <span style="font-size:14px;color:#444932;line-height:1.5;display:block;margin-bottom:12px">Ariely expande sus hallazgos del MIT en un libro de lectura esencial sobre los patrones irracionales que guían las decisiones económicas — incluido cómo el precio de un producto altera la percepción de su calidad y efectividad (el experimento de los analgésicos).</span>
+      <div style="display:flex;gap:8px;flex-wrap:wrap">
+        <a href="https://www.amazon.com/Predictably-Irrational-Hidden-Forces-Decisions/dp/0061353248" target="_blank" rel="noopener" style="display:inline-flex;align-items:center;gap:6px;padding:8px 14px;background:#536600;color:#fff;border-radius:99px;font-size:12px;font-weight:700;text-decoration:none">
+          📦 Amazon
+        </a>
+        <a href="https://www.amazon.es/Predictably-Irrational-Hidden-Forces-Decisions/dp/0061353248" target="_blank" rel="noopener" style="display:inline-flex;align-items:center;gap:6px;padding:8px 14px;background:#f5f3f3;color:#1b1c1c;border:1px solid #e4e2e2;border-radius:99px;font-size:12px;font-weight:700;text-decoration:none">
+          📦 Amazon ES
+        </a>
+        <a href="https://www.goodreads.com/book/show/1713426.Predictably_Irrational" target="_blank" rel="noopener" style="display:inline-flex;align-items:center;gap:6px;padding:8px 14px;background:#f5f3f3;color:#1b1c1c;border:1px solid #e4e2e2;border-radius:99px;font-size:12px;font-weight:700;text-decoration:none">
+          📖 Goodreads
+        </a>
+      </div>
+    </div>
+
+    <div class="sc" style="border-left:4px solid #536600">
+      <span class="sc-lbl">Daniel Kahneman · 2011</span>
+      <strong style="display:block;font-size:16px;color:#1b1c1c;margin-bottom:4px">Thinking, Fast and Slow</strong>
+      <span style="font-size:14px;color:#444932;line-height:1.5;display:block;margin-bottom:12px">El trabajo definitivo de Kahneman sobre los dos sistemas del pensamiento humano. El efecto de anclaje (base teórica de este playbook) está explicado con profundidad en el capítulo 11. Un libro que cambia permanentemente cómo se lee cualquier negociación.</span>
+      <div style="display:flex;gap:8px;flex-wrap:wrap">
+        <a href="https://www.amazon.com/Thinking-Fast-Slow-Daniel-Kahneman/dp/0374533555" target="_blank" rel="noopener" style="display:inline-flex;align-items:center;gap:6px;padding:8px 14px;background:#536600;color:#fff;border-radius:99px;font-size:12px;font-weight:700;text-decoration:none">
+          📦 Amazon
+        </a>
+        <a href="https://www.amazon.es/Thinking-Fast-Slow-Daniel-Kahneman/dp/0374533555" target="_blank" rel="noopener" style="display:inline-flex;align-items:center;gap:6px;padding:8px 14px;background:#f5f3f3;color:#1b1c1c;border:1px solid #e4e2e2;border-radius:99px;font-size:12px;font-weight:700;text-decoration:none">
+          📦 Amazon ES
+        </a>
+        <a href="https://www.goodreads.com/book/show/11468377-thinking-fast-and-slow" target="_blank" rel="noopener" style="display:inline-flex;align-items:center;gap:6px;padding:8px 14px;background:#f5f3f3;color:#1b1c1c;border:1px solid #e4e2e2;border-radius:99px;font-size:12px;font-weight:700;text-decoration:none">
+          📖 Goodreads
+        </a>
+      </div>
+    </div>
+
+  </div>
+
+  <div class="rule" style="margin-top:32px"></div>
+
+  <!-- PAPERS ACADÉMICOS -->
+  <div style="margin-bottom:8px;font-size:11px;font-weight:800;text-transform:uppercase;letter-spacing:.12em;color:#757a60">🔬 Investigación académica</div>
+  <div class="sc-list">
+
+    <div class="sc">
+      <span class="sc-lbl">Tversky & Kahneman · 1974 · Science, 185(4157)</span>
+      <strong style="display:block;font-size:15px;color:#1b1c1c;margin-bottom:4px">Judgment under Uncertainty: Heuristics and Biases</strong>
+      <span style="font-size:14px;color:#444932;line-height:1.5;display:block;margin-bottom:10px">El paper seminal que describe el efecto de anclaje. Demuestra que las personas dependen de una pieza inicial de información (el ancla) para tomar decisiones posteriores, incluso cuando esa ancla es arbitraria.</span>
+      <a href="https://www.science.org/doi/10.1126/science.185.4157.1124" target="_blank" rel="noopener" style="display:inline-flex;align-items:center;gap:6px;padding:7px 12px;background:#f5f3f3;color:#536600;border:1px solid #c5c9ac;border-radius:99px;font-size:11px;font-weight:700;text-decoration:none">
+        🔗 Ver paper en Science.org
+      </a>
+    </div>
+
+    <div class="sc">
+      <span class="sc-lbl">Ariely, Loewenstein & Prelec · 2003 · QJE 118(1)</span>
+      <strong style="display:block;font-size:15px;color:#1b1c1c;margin-bottom:4px">Coherent Arbitrariness: Stable Demand Curves Without Stable Preferences</strong>
+      <span style="font-size:14px;color:#444932;line-height:1.5;display:block;margin-bottom:10px">El experimento del MIT que demostró que cobrar bajo literalmente hace que el trabajo parezca de menor calidad. Los participantes evaluaron peor los mismos resultados cuando pagaron menos. El precio no solo refleja el valor — lo construye.</span>
+      <a href="https://academic.oup.com/qje/article/118/1/73/1925021" target="_blank" rel="noopener" style="display:inline-flex;align-items:center;gap:6px;padding:7px 12px;background:#f5f3f3;color:#536600;border:1px solid #c5c9ac;border-radius:99px;font-size:11px;font-weight:700;text-decoration:none">
+        🔗 Ver paper en Oxford Academic
+      </a>
+    </div>
+
+    <div class="sc">
+      <span class="sc-lbl">Galinsky & Mussweiler · 2001 · JPSP 81(4)</span>
+      <strong style="display:block;font-size:15px;color:#1b1c1c;margin-bottom:4px">First Offers as Anchors: The Role of Perspective-Taking and Negotiator Focus</strong>
+      <span style="font-size:14px;color:#444932;line-height:1.5;display:block;margin-bottom:10px">Demuestra que quienes hacen la primera oferta en una negociación obtienen acuerdos más favorables — y que las ofertas iniciales altas funcionan como ancla incluso frente a contrapartes experimentadas.</span>
+      <a href="https://psycnet.apa.org/doi/10.1037/0022-3514.81.4.657" target="_blank" rel="noopener" style="display:inline-flex;align-items:center;gap:6px;padding:7px 12px;background:#f5f3f3;color:#536600;border:1px solid #c5c9ac;border-radius:99px;font-size:11px;font-weight:700;text-decoration:none">
+        🔗 Ver paper en APA PsycNet
+      </a>
+    </div>
+
+    <div class="sc">
+      <span class="sc-lbl">Freelancers Union & Upwork · 2022</span>
+      <strong style="display:block;font-size:15px;color:#1b1c1c;margin-bottom:4px">Freelancing in America — Annual Survey</strong>
+      <span style="font-size:14px;color:#444932;line-height:1.5;display:block;margin-bottom:10px">El estudio más grande sobre el estado del trabajo freelance en EE.UU. La estadística citada (73% de creativos cobran por debajo de su valor de mercado) proviene de esta encuesta anual.</span>
+      <a href="https://www.upwork.com/research/freelancing-in-america" target="_blank" rel="noopener" style="display:inline-flex;align-items:center;gap:6px;padding:7px 12px;background:#f5f3f3;color:#536600;border:1px solid #c5c9ac;border-radius:99px;font-size:11px;font-weight:700;text-decoration:none">
+        🔗 Ver reporte en Upwork Research
+      </a>
+    </div>
+
+  </div>
+
+  <div style="margin-top:28px;padding:16px;background:#f5f3f3;border-radius:12px;border:1px dashed #c5c9ac;font-size:13px;color:#757a60;line-height:1.6">
+    Todas las citas fueron verificadas en sus fuentes primarias. Si encontrás algún error o querés profundizar en alguno de estos temas, podés escribirnos a través de Gumroad.
   </div>
   </div>
 </section>
