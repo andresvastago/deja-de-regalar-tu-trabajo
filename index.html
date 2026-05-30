@@ -399,15 +399,80 @@ html, body {
   min-width: 40px; min-height: 40px; border-radius: 99px; border: 1px solid #e4e2e2;
   background: rgba(255, 255, 255, 0.9); color: #1b1c1c;
   backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px);
-  transition: all 0.2s;
+  transition: all 0.2s; cursor: pointer;
 }
 #font-btn:active { transform: scale(0.92); }
 #font-btn.large  { color: #536600; border-color: #536600; font-weight: 900; }
 
+/* Botón Dark/Light */
+#theme-btn {
+  position: fixed; top: max(16px, calc(12px + env(safe-area-inset-top, 0px))); left: calc(64px + env(safe-area-inset-left, 0px)); z-index: 100;
+  width: 40px; height: 40px; border-radius: 99px; border: 1px solid #e4e2e2;
+  background: rgba(255, 255, 255, 0.9); color: #1b1c1c;
+  backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px);
+  transition: all 0.2s; cursor: pointer;
+  display: flex; align-items: center; justify-content: center;
+}
+#theme-btn:active { transform: scale(0.92); }
+
 :root { --ts: 1; }
 .body { font-size: calc(16px * var(--ts)); }
 @media (min-width: 768px) { .body { font-size: calc(18px * var(--ts)); } }
-.large-text { --ts: 1.15; }
+
+/* ─── DARK MODE ─── */
+html.dark body { background-color: #1a1b1c; color: #e4e2e2; }
+html.dark .s   { background-color: #1a1b1c !important; color: #e4e2e2; }
+html.dark .s--cream { background-color: #222425 !important; }
+html.dark .s--sand  { background-color: #292b2c !important; }
+html.dark .h1, html.dark .h2 { color: #f2f0f0 !important; }
+html.dark .body { color: #c5c9ac !important; }
+html.dark .body strong { color: #f2f0f0; }
+html.dark .body p { color: #c5c9ac; }
+html.dark .opener { color: #b0d500 !important; border-bottom-color: #3a3d2a !important; }
+html.dark .eyebrow { color: #757a60 !important; }
+html.dark .rule { background: #d4ff00; }
+html.dark .cite, html.dark .chk, html.dark .layer, html.dark .sc, html.dark .sc-card, html.dark .pivot, html.dark .stat {
+  background: #262829 !important; border-color: #3a3b3c !important;
+}
+html.dark .cite-body, html.dark .lb, html.dark .sc { color: #c5c9ac !important; }
+html.dark .cite-title, html.dark .lt { color: #f2f0f0 !important; }
+html.dark .pivot { color: #e4e2e2 !important; }
+html.dark .stat-num { color: #b0d500 !important; }
+html.dark .stat-lbl { color: #c5c9ac !important; }
+html.dark .sc-lbl { color: #757a60 !important; }
+html.dark .calc-card { background: #262829 !important; border-color: #3a3b3c !important; }
+html.dark .field input { background: #1a1b1c !important; border-color: #3a3b3c !important; color: #f2f0f0 !important; }
+html.dark .field input:focus { border-color: #b0d500 !important; }
+html.dark .field label { color: #757a60 !important; }
+html.dark .out { background: #333 !important; color: #e4e2e2 !important; }
+html.dark .out.main { background: #d4ff00 !important; color: #1a1a1a !important; }
+html.dark .out.anchor { background: #1a1b1c !important; }
+html.dark .out-lbl { color: inherit !important; }
+html.dark .pbtn { background: #262829 !important; border-color: #3a3b3c !important; color: #c5c9ac !important; }
+html.dark .pbtn.on { border-color: #b0d500 !important; color: #b0d500 !important; background: #262829 !important; }
+html.dark .adv-toggle { border-color: #3a3b3c !important; color: #757a60 !important; }
+html.dark .adv-ttl { color: #757a60 !important; border-bottom-color: #3a3b3c !important; }
+html.dark .sep { background: #3a3b3c !important; }
+html.dark .sc-head { background: #303132 !important; color: #c5c9ac !important; }
+html.dark .sc-body { background: #262829 !important; color: #e4e2e2 !important; }
+html.dark .copy-btn { background: #262829 !important; color: #b0d500 !important; }
+html.dark .copy-btn.ok { background: #1a2e1a !important; color: #4ade80 !important; }
+html.dark .top-bar { background: #303132 !important; }
+html.dark #font-btn { background: rgba(30,31,32,0.95) !important; color: #e4e2e2 !important; border-color: #3a3b3c !important; }
+html.dark #font-btn.large { color: #b0d500 !important; border-color: #b0d500 !important; }
+html.dark #theme-btn { background: rgba(30,31,32,0.95) !important; color: #e4e2e2 !important; border-color: #3a3b3c !important; }
+html.dark .ci { border-bottom-color: #3a3b3c !important; }
+html.dark .ct { color: #e4e2e2 !important; }
+html.dark .ci.on .ct { color: #757a60 !important; }
+html.dark .cb { background: #262829 !important; border-color: #555 !important; }
+html.dark .ci.on .cb { background: #536600 !important; border-color: #536600 !important; }
+html.dark .cl-track { background: #3a3b3c !important; }
+html.dark .cl-pct { color: #b0d500 !important; }
+html.dark .ln { background: #303132 !important; color: #b0d500 !important; }
+html.dark .cite-ref { color: #757a60 !important; }
+html.dark #nav-prev.cd { background: rgba(255,255,255,0.08) !important; color: #c5c9ac !important; border-color: rgba(255,255,255,0.12) !important; }
+html.dark #nav-next { box-shadow: 0 4px 12px rgba(212,255,0,0.15) !important; }
+html.dark .calc-note { color: #757a60 !important; }
 
 /* Animaciones */
 .anim {
@@ -478,6 +543,7 @@ html, body {
 </div>
 
 <button id="font-btn" onclick="toggleFont()" title="Cambiar tamaño de texto">Aa</button>
+<button id="theme-btn" onclick="toggleTheme()" title="Cambiar tema"><span class="material-symbols-outlined" style="font-size:18px;line-height:1">dark_mode</span></button>
 <div class="top-bar"><div class="top-fill" id="prog"></div></div>
 <div class="cl" id="ctr">1 / 9</div>
 <button class="cl" hidden="" id="nav-prev" onclick="navigate(-1)">← Anterior</button>
@@ -500,7 +566,7 @@ html, body {
 <!-- ══ 02 · PARA QUIÉN ══ -->
 <section class="s s--cream" id="s2">
   <div class="s-body">
-  <div class="opener">"Si alguna vez dijiste tu precio y, al mismo tiempo, una parte tuya pedía disculpas por molestarlo — este libro fue escrito para ese momento exacto."</div>
+  <div class="opener">"Si alguna vez dijiste tu precio y, al mismo tiempo, una parte de vos quería disculparse por haberlo dicho — este libro fue escrito para ese momento exacto."</div>
   <div class="eyebrow">01 · Para Quién</div>
   <div class="h1">¿Te reconocés<br/>en esto?</div>
   <div class="checks">
@@ -990,7 +1056,10 @@ function burst(x, y) {
 // ═══ FONT SIZE TOGGLE ═══
 const FKEY = 'drtt-font';
 function toggleFont() {
-  const large = document.body.classList.toggle('large-text');
+  const large = !document.documentElement.classList.contains('large-text');
+  document.documentElement.classList.toggle('large-text', large);
+  // Escribir la variable directamente en :root para máxima compatibilidad
+  document.documentElement.style.setProperty('--ts', large ? '1.18' : '1');
   const btn = document.getElementById('font-btn');
   btn.classList.toggle('large', large);
   btn.textContent = large ? 'Aa ↑' : 'Aa';
@@ -999,10 +1068,32 @@ function toggleFont() {
 (function() {
   try {
     if (localStorage.getItem(FKEY) === '1') {
-      document.body.classList.add('large-text');
+      document.documentElement.classList.add('large-text');
+      document.documentElement.style.setProperty('--ts', '1.18');
       const btn = document.getElementById('font-btn');
-      btn.classList.add('large');
-      btn.textContent = 'Aa ↑';
+      if (btn) { btn.classList.add('large'); btn.textContent = 'Aa ↑'; }
+    }
+  } catch (e) {}
+})();
+
+// ═══ DARK / LIGHT TOGGLE ═══
+const TKEY = 'drtt-theme';
+function toggleTheme() {
+  const isDark = document.documentElement.classList.toggle('dark');
+  const btn = document.getElementById('theme-btn');
+  btn.innerHTML = isDark
+    ? '<span class="material-symbols-outlined" style="font-size:18px;line-height:1">light_mode</span>'
+    : '<span class="material-symbols-outlined" style="font-size:18px;line-height:1">dark_mode</span>';
+  try { localStorage.setItem(TKEY, isDark ? 'dark' : 'light'); } catch (e) {}
+}
+(function() {
+  try {
+    if (localStorage.getItem(TKEY) === 'dark') {
+      document.documentElement.classList.add('dark');
+      setTimeout(function() {
+        const btn = document.getElementById('theme-btn');
+        if (btn) btn.innerHTML = '<span class="material-symbols-outlined" style="font-size:18px;line-height:1">light_mode</span>';
+      }, 0);
     }
   } catch (e) {}
 })();
